@@ -1,4 +1,5 @@
 name:                tower-camkes-odroid
+synopsis:            Driver interface for seL4/Camkes on ODROID.
 version:             0.0.1.0
 author:              Galois, Inc.
 maintainer:          leepike@galois.com
@@ -6,23 +7,44 @@ category:            Language
 build-type:          Simple
 cabal-version:       >= 1.10
 license:             BSD3
+data-files: data/uart/components/uart_monitor/uart_monitor.camkes,
+            data/uart/components/uart_monitor/src/driver.c,
+            data/uart/components/uart_monitor/src/smaccm_uart_monitor.c,
+            data/uart/interfaces/uart_monitor.idl4
+source-repository    this
+  type:     git
+  location: https://github.com/GaloisInc/tower-camkes-odroid
+  tag:      hackage-backend-0101
 
 library
   exposed-modules: Tower.Odroid.Serial
-  build-depends: base >= 4.6
-               -- , transformers
-               -- , containers
-               -- , monadLib
-               -- , directory
-               -- , filepath
-               -- , dlist
-               -- , wl-pprint
-               , ivory >= 0.1.0.2
-               , ivory-artifact
-               , ivory-backend-c
-               , tower
-               , tower-aadl
+  build-depends:   base >= 4.6
+                 , filepath
+                 , ivory >= 0.1.0.2
+                 , ivory-artifact
+                 , ivory-backend-c
+                 , tower
+                 , tower-aadl
+                 -- XXX testing
+                 , ivory-stdlib
+  other-modules: Paths_tower_camkes_odroid
 
   hs-source-dirs:       src
   default-language:     Haskell2010
   ghc-options:          -Wall -fno-warn-orphans
+
+
+-- executable serial-test
+--   hs-source-dirs:   test
+--   main-is:          SerialTest.hs
+--   build-depends: base >= 4.6
+--                , ivory >= 0.1.0.1
+--                , ivory-stdlib
+--                , tower
+--                , tower-aadl
+--                , tower-camkes-odroid
+--   default-language: Haskell2010
+--   if impl(ghc >= 7.8)
+--     ghc-options:        -Wall -fhpc -fplugin=Ivory.Tower.SrcLoc.Plugin -fplugin-opt=Ivory.Tower.SrcLoc.Plugin:kill-foreign-stubs
+--   else
+--     ghc-options:        -Wall

@@ -16,11 +16,14 @@ include Makefile.deps
 
 create-sandbox:
 	cabal sandbox init
-	echo "tests: True" >> cabal.sandbox.config
 ifneq ($(strip $(CABAL_PACKAGE_SOURCES)),)
 	cabal sandbox add-source $(CABAL_PACKAGE_SOURCES)
 endif
 	cabal install --dependencies-only
+
+copy-sandbox:
+	cabal configure
+	cabal copy
 
 clean:
 
