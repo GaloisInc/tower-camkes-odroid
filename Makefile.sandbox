@@ -1,8 +1,6 @@
 default:
 	cabal build
 
-test:
-
 define add-cabal-package-source-once
 ifeq ($(findstring $(1) ,$(CABAL_PACKAGE_SOURCES) ),)
 CABAL_PACKAGE_SOURCES += $(1)
@@ -25,8 +23,6 @@ copy-sandbox:
 	cabal configure
 	cabal copy
 
-clean:
-
 distclean: clean
 	-rm -rf dist
 
@@ -34,4 +30,4 @@ clean-sandbox: distclean
 	-rm -rf cabal.sandbox.config
 	-rm -rf .cabal-sandbox
 
-.PHONY: default test create-sandbox clean distclean clean-sandbox
+.PHONY: default create-sandbox clean distclean clean-sandbox
