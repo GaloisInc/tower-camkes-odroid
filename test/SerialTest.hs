@@ -17,6 +17,9 @@
 
 module Main where
 
+import System.Environment
+import Data.Maybe
+
 import Ivory.Language
 import Ivory.Stdlib
 import Ivory.Tower
@@ -74,11 +77,16 @@ receive = proc "receive" $ \input1 -> body $ do
 -- Compiler
 
 main :: IO ()
-main =
+main = do
+  args <- getArgs
+  opts <- parseOpts args
   runCompileAADL
-    initialOpts { genDirOpts = Just "out/testUart"
-                , configOpts = uartConfig
-                }
+    opts  { genDirOpts = if isNothing (genDirOpts opts)
+                           then Just "out/testUart"
+                           else genDirOpts opts
+          , configOpts =
+              configOpts opts `appendArtifacts` uartConfig
+          }
     testSerial
 
 --------------------------------------------------------------------------------
