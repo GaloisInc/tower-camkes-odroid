@@ -87,7 +87,6 @@ uartArtifacts =
   [ a compDir (uart_monitor <.> "camkes")
   , a srcDir  "driver.c"
   , a srcDir  ("smaccm_uart_monitor" <.> "c")
-  , a intfDir (uart_monitor <.> "idl4")
   ]
   where
   a d f   = R.artifactPath d
@@ -95,7 +94,6 @@ uartArtifacts =
   uartDir = "data/uart"
   compDir = "components" </> uart_monitor
   srcDir  = compDir </> "src"
-  intfDir = "interfaces"
 
 uartModule :: Module
 uartModule = package "towerUartDeps" $
