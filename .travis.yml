@@ -8,13 +8,6 @@ install:
   - cabal install cabal-install
   - cabal install alex happy
 script:
-  - echo $PATH
-  - make $ENV_TEST_TARGET
+  - make
 ghc:
   - 7.8
-env:
-  - ENV_TEST_TARGET=ivory-freertos-bindings
-  - ENV_TEST_TARGET=ivory-bsp-stm32
-  - ENV_TEST_TARGET=tower-freertos-stm32
-  - ENV_TEST_TARGET=tower-freertos-stm32-tests
-  - ENV_TEST_TARGET=ivory-bsp-tests
