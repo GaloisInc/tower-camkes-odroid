@@ -18,8 +18,8 @@
 
 module Tower.Odroid.Serial
   ( uartTower
-  , uart_num
-  , datum
+  , uart_packet_payload
+  , uart_packet_len
   , uartConfig
   ) where
 
@@ -33,23 +33,23 @@ import qualified Paths_tower_camkes_odroid as P
 
 --------------------------------------------------------------------------------
 
--- Interface struct
 [ivory|
+
 struct uart_packet
-  { int32_t uart_num
-  ; uint8_t   datum
+  { uint8_t[255]  uart_packet_payload
+  ; uint8_t       uart_packet_len
   }
 |]
 
-uart_monitor :: String
-uart_monitor = "uart_monitor"
+uart :: String
+uart = "uart"
 
--- | Wrapper monitor. The string names (e.g., "uart_monitor") must be unique and
+-- | Wrapper monitor. The string names (e.g., "uart") must be unique and
 -- fixed.
 uartTower
   :: ChanOutput (Struct "uart_packet")
   -- ^ Output from client
-  -> ChanInput  (Struct "uart_packet")
+  -> ChanInput  (Stored Uint8)
   -- ^ Input to client
   -> Tower e ()
 uartTower s2wRx w2rTx
@@ -60,9 +60,9 @@ uartTower s2wRx w2rTx
   -- From wrapper to driver
   (w2dTx, _ ) <- channel
   -- From driver to wrapper
-  (_, d2wRx :: ChanOutput (Struct "uart_packet")) <- channel
+  (_, d2wRx :: ChanOutput (Stored Uint8)) <- channel
 
-  externalMonitor uart_monitor $ do
+  externalMonitor uart $ do
     -- Rx from sender, define a symbol for handling msg, but don't implement it.
     handler s2wRx "send" $ do
       e <- emitter w2dTx 1
@@ -84,15 +84,15 @@ uartConfig = A.initialConfig
 
 uartArtifacts :: [R.Artifact]
 uartArtifacts =
-  [ a compDir (uart_monitor <.> "camkes")
+  [ a compDir (uart <.> "camkes")
   , a srcDir  "driver.c"
-  , a srcDir  ("smaccm_uart_monitor" <.> "c")
+  , a srcDir  ("smaccm_uart" <.> "c")
   ]
   where
   a d f   = R.artifactPath d
           $ R.artifactCabalFile P.getDataDir (uartDir </> d </> f)
   uartDir = "data/uart"
-  compDir = "components" </> uart_monitor
+  compDir = "components" </> uart
   srcDir  = compDir </> "src"
 
 uartModule :: Module

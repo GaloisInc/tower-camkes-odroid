@@ -44,15 +44,12 @@ testSerial = do
   monitor "sender" $ do
     c <- stateInit "charState" (ival 65) -- 'A'
     packet <- stateInit "packet" izero
+
     handler per "periodicHandler" $ do
       e <- emitter s2wTx 1 -- Send to wrapper
       callback $ \_msg -> do
-        c' <- deref c
-        call_ send packet c'
-        emit e (constRef packet)
-        ifte_ (c' >? 90) -- 'Z'
-              (store c 65)
-              (c += 1)
+         call_ send packet c
+         emit e (constRef packet)
 
   monitor "receiver" $ do
     handler w2rRx "receiverHandler" $ do
@@ -60,17 +57,23 @@ testSerial = do
         call_ receive msg
 
 -- user_sender.c
-send :: Def('[Ref s (Struct "uart_packet"), Uint8] :-> ())
+send :: Def('[Ref s (Struct "uart_packet"), Ref s (Stored Uint8)] :-> ())
 send = proc "send" $ \packet c -> body $ do
-  store (packet ~> uart_num) 0
-  store (packet ~> datum) c
-  d <- deref (packet ~> datum)
-  call_ printf2 "Sending code: 0x%x --> %c\n" d d
+  for 5 $ \ix -> do
+    let arr = packet ~> uart_packet_payload
+    c' <- deref c
+    store (arr!ix) c'
+    call_ printf2 "Sending code: 0x%x --> %c\n" c' c'
+    ifte_ (c' >? 90) -- 'Z'
+          (store c 65)
+          (c += 1)
+  store (packet ~> uart_packet_len) 5
+  call_ printf0 "Sent!\n"
 
 -- user_receiver.c
-receive :: Def('[ConstRef s (Struct "uart_packet")] :-> ())
-receive = proc "receive" $ \input1 -> body $ do
-  d <- input1 ~>* datum
+receive :: Def('[ConstRef s (Stored Uint8)] :-> ())
+receive = proc "receive" $ \input -> body $ do
+  d <- deref input
   call_ printf1 "Received input: 0x%x --> %c\n" d
 
 --------------------------------------------------------------------------------
@@ -93,12 +96,14 @@ main = do
 -- Helpers
 
 [ivory|
+import (stdio.h, printf) void printf0(string x)
 import (stdio.h, printf) void printf1(string x, uint8_t y)
 import (stdio.h, printf) void printf2(string x, uint8_t y, uint8_t z)
 |]
 
 towerDepModule :: Module
 towerDepModule = package "towerDeps" $ do
+  incl printf0
   incl printf1
   incl printf2
   incl send
