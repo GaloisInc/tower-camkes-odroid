@@ -13,7 +13,6 @@
 #include <platsupport/chardev.h>
 #include <platsupport/serial.h>
 #include <utils/util.h>
-#include <smaccm_uart.h>
 #include <uart.h>
 
 #define BAUD_RATE 115200
@@ -106,16 +105,16 @@ write_callback(ps_chardevice_t* device, enum chardev_status stat,
     t = (struct uart_token*) token;
     t->cur_bytes += bytes_transfered;
     if (t->cur_bytes == t->req_bytes) {
-	uart_completed_write_void();
+      //XXX	uart_completed_write_void();
     }
 }
 
-bool send_write_uart__packet_i(const uart__packet_i *packet) {
+bool uart_write(const Data_Types__uart_packet_impl *packet) {
     struct uart_token token;
 
     token.cur_bytes = 0;
-    token.req_bytes = packet->length;
-    token.buf = (char*) packet->payload;
+    token.req_bytes = packet->uart_packet_len;
+    token.buf = (char*) packet->uart_packet_payload;
 
     if (ps_cdev_write(&serial_device, token.buf, token.req_bytes, &write_callback, &token) < 0) {
         printf("Error writing to UART\n");
@@ -132,7 +131,7 @@ int run(void)
     while (1) {
         int r = uart_read(&c, 1);
         if (r > 0) {
-	    uart_recv_write_uint8_t((uint8_t*) &c);
+	    uart_Output_recv_0_write_uint8_t((uint8_t*) &c);
         }
     }
 
