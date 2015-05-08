@@ -109,12 +109,12 @@ write_callback(ps_chardevice_t* device, enum chardev_status stat,
     }
 }
 
-bool uart_write(const Data_Types__uart_packet_impl *packet) {
+bool uart_write(const Data_Types__ivory_string_UartPacket_impl *packet) {
     struct uart_token token;
 
     token.cur_bytes = 0;
-    token.req_bytes = packet->uart_packet_len;
-    token.buf = (char*) packet->uart_packet_payload;
+    token.req_bytes = packet->ivory_string_UartPacket_len;
+    token.buf = (char*) packet->ivory_string_UartPacket_data;
 
     if (ps_cdev_write(&serial_device, token.buf, token.req_bytes, &write_callback, &token) < 0) {
         printf("Error writing to UART\n");
@@ -131,7 +131,7 @@ int run(void)
     while (1) {
         int r = uart_read(&c, 1);
         if (r > 0) {
-	    uart_Output_recv_0_write_uint8_t((uint8_t*) &c);
+	    uart_Output_recv_rx_0_write_uint8_t((uint8_t*) &c);
         }
     }
 

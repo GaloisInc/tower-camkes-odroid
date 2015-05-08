@@ -4,4 +4,5 @@ $(call add-cabal-package-source, \
   $(IVORY_REPO)/ivory-backend-c \
   $(TOWER_REPO)/tower \
   $(TOWER_REPO)/tower-aadl \
+  $(TOWER_REPO)/tower-hal \
 )

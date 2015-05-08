@@ -5,6 +5,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE TypeOperators #-}
 {-# LANGUAGE PostfixOperators #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE TypeFamilies #-}
+
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 --------------------------------------------------------------------------------
 -- UART client example, corresponding to
@@ -24,7 +28,10 @@ import Ivory.Language
 import Ivory.Stdlib
 import Ivory.Tower
 import Tower.AADL
+import qualified Ivory.Tower.HAL.Bus.Interface as I
 import Tower.Odroid.Serial
+
+--------------------------------------------------------------------------------
 
 testSerial :: Tower e ()
 testSerial = do
@@ -33,44 +40,36 @@ testSerial = do
 
   per <- period (2000`ms`)
 
-  -- From user code sender to wrapper
-  (s2wTx, s2wRx) <- channel
-  -- From wrapper to user code receiver
-  (w2rTx, w2rRx) <- channel
-
-  -- Notification from wrapper to sender
-  (notifyTx, notifyRx) <- channel
-
   -- Driver wrapper
-  uartTower s2wRx w2rTx notifyTx
+  (b, o) <- uartTower
 
   monitor "sender" $ do
     c <- stateInit "charState" (ival 65) -- 'A'
     packet <- stateInit "packet" izero
 
     handler per "periodicHandler" $ do
-      e <- emitter s2wTx 1 -- Send to wrapper
+      e <- emitter (I.backpressureTransmit b) 1 -- Send to wrapper
       callback $ \_msg -> do
          call_ send packet c
          emit e (constRef packet)
 
   monitor "receiver" $ do
-    handler w2rRx "receiverHandler" $ do
+    handler o "receiverHandler" $ do
       callback $ \msg -> do -- Receive from wrapper
         call_ receive msg
 
 -- user_sender.c
-send :: Def('[Ref s (Struct "uart_packet"), Ref s (Stored Uint8)] :-> ())
+send :: Def('[Ref s (Struct "ivory_string_UartPacket"), Ref s (Stored Uint8)] :-> ())
 send = proc "send" $ \packet c -> body $ do
   for 5 $ \ix -> do
-    let arr = packet ~> uart_packet_payload
+    let arr = packet ~> stringDataL
     c' <- deref c
     store (arr!ix) c'
     call_ printf2 "Sending code: 0x%x --> %c\n" c' c'
     ifte_ (c' >? 90) -- 'Z'
           (store c 65)
           (c += 1)
-  store (packet ~> uart_packet_len) 5
+  store (packet ~> stringLengthL) 5
   call_ printf0 "Sent!\n"
 
 -- user_receiver.c

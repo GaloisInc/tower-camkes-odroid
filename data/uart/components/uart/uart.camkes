@@ -1,7 +1,7 @@
 import "../../interfaces/uart_interface.idl4";
 import "../../interfaces/uint8_t_writer.idl4";
 import "../../interfaces/void_writer.idl4";
-import "../../interfaces/Data_Types__uart_packet_impl_writer.idl4";
+import "../../interfaces/Data_Types__ivory_string_UartPacket_impl_writer.idl4";
 import "../../interfaces/receiverhandler_interface.idl4";
 
 component uart {
@@ -9,8 +9,8 @@ component uart {
 
   include "smaccm_sys_impl_types.h";
 
-  provides Data_Types__uart_packet_impl_writer Input_send;
-  uses uint8_t_writer uart_Output_recv_0;
+  provides Data_Types__ivory_string_UartPacket_impl_writer Input_send;
+  uses uint8_t_writer uart_Output_recv_rx_0;
 
   // Hardware interface
   dataport Buf            vaddr;

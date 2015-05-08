@@ -25,6 +25,7 @@ library
                  , ivory-backend-c
                  , tower
                  , tower-aadl
+                 , tower-hal
                  -- XXX testing
                  , ivory-stdlib
   other-modules: Paths_tower_camkes_odroid
@@ -41,6 +42,7 @@ executable serial-test
                , ivory-stdlib
                , tower
                , tower-aadl
+               , tower-hal
                , tower-camkes-odroid
   default-language: Haskell2010
   if impl(ghc >= 7.8)
