@@ -21,6 +21,7 @@ module Tower.Odroid.Serial
   , uart_packet_payload
   , uart_packet_len
   , uartConfig
+  , uartModule
   ) where
 
 import           Ivory.Tower
@@ -51,8 +52,10 @@ uartTower
   -- ^ Output from client
   -> ChanInput  (Stored Uint8)
   -- ^ Input to client
+  -> ChanInput  (Stored IBool)
+  -- ^ Input to client
   -> Tower e ()
-uartTower s2wRx w2rTx
+uartTower s2wRx w2rTx notifyTx
   = do
   towerModule  uartModule
   towerDepends uartModule
@@ -66,7 +69,10 @@ uartTower s2wRx w2rTx
     -- Rx from sender, define a symbol for handling msg, but don't implement it.
     handler s2wRx "send" $ do
       e <- emitter w2dTx 1
-      callback $ \msg -> emit e msg
+      b <- emitter notifyTx 1
+      callback $ \msg -> do
+        emit e msg
+        emitV b true
 
     -- From driver
     handler d2wRx "recv" $ do

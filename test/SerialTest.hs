@@ -38,8 +38,11 @@ testSerial = do
   -- From wrapper to user code receiver
   (w2rTx, w2rRx) <- channel
 
+  -- Notification from wrapper to sender
+  (notifyTx, notifyRx) <- channel
+
   -- Driver wrapper
-  uartTower s2wRx w2rTx
+  uartTower s2wRx w2rTx notifyTx
 
   monitor "sender" $ do
     c <- stateInit "charState" (ival 65) -- 'A'
@@ -74,7 +77,7 @@ send = proc "send" $ \packet c -> body $ do
 receive :: Def('[ConstRef s (Stored Uint8)] :-> ())
 receive = proc "receive" $ \input -> body $ do
   d <- deref input
-  call_ printf1 "Received input: 0x%x --> %c\n" d
+  call_ printf1 "Received input: %c\n" d
 
 --------------------------------------------------------------------------------
 -- Compiler
@@ -108,3 +111,4 @@ towerDepModule = package "towerDeps" $ do
   incl printf2
   incl send
   incl receive
+  depend uartModule
