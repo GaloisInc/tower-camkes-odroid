@@ -18,10 +18,11 @@
 --
 --------------------------------------------------------------------------------
 
-module Tower.Odroid.Serial
+module Tower.Odroid.UART
   ( uartTower
   , uartConfig
   , uartModule
+  , UartPacket
   ) where
 
 import           Ivory.Tower
@@ -38,14 +39,12 @@ import qualified Paths_tower_camkes_odroid as P
 uart :: String
 uart = "uart"
 
-
 [ivory| string struct UartPacket 255 |]
 
 -- | Wrapper monitor. The string names (e.g., "uart") must be unique and
 -- fixed.
-uartTower :: IvoryString s
-  => Tower e ( I.BackpressureTransmit s (Stored IBool)
-             , ChanOutput (Stored Uint8))
+uartTower :: Tower e ( I.BackpressureTransmit UartPacket (Stored IBool)
+                     , ChanOutput (Stored Uint8))
 uartTower
   = do
   towerModule  uartModule
@@ -63,8 +62,7 @@ uartTower
   return (I.BackpressureTransmit (fst req_chan) (snd resp_chan), snd rx_chan)
 
 -- The wrapper just passes the channel values through to and from the driver.
-wrapperMonitor :: IvoryString s
-               => ChanOutput s
+wrapperMonitor :: ChanOutput UartPacket
                -> ChanInput (Stored IBool)
                -> ChanInput (Stored Uint8)
                -> Tower e ()
@@ -111,7 +109,6 @@ uartArtifacts :: [R.Artifact]
 uartArtifacts =
   [ a compDir (uart <.> "camkes")
   , a srcDir  "driver.c"
-  , a srcDir  ("smaccm_uart" <.> "c")
   ]
   where
   a d f   = R.artifactPath d

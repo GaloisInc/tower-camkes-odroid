@@ -17,7 +17,8 @@ source-repository    this
   tag:      hackage-backend-0101
 
 library
-  exposed-modules: Tower.Odroid.Serial
+  exposed-modules: Tower.Odroid.UART,
+                   Tower.Odroid.CAN
   build-depends:   base >= 4.6
                  , filepath
                  , ivory >= 0.1.0.2
