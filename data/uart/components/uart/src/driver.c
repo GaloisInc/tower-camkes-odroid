@@ -102,10 +102,11 @@ static void
 write_callback(ps_chardevice_t* device, enum chardev_status stat,
                size_t bytes_transfered, void* token) {
     struct uart_token* t;
+    const bool b;
     t = (struct uart_token*) token;
     t->cur_bytes += bytes_transfered;
     if (t->cur_bytes == t->req_bytes) {
-      uart_Output_recv_resp_0_write_bool(true);
+      uart_Output_recv_resp_0_write_bool(&b);
     }
 }
 
@@ -115,7 +116,6 @@ bool Input_send_write_Data_Types__ivory_string_UartPacket_impl(const Data_Types_
     token.cur_bytes = 0;
     token.req_bytes = packet->ivory_string_UartPacket_len;
     token.buf = (char*) packet->ivory_string_UartPacket_data;
-
     if (ps_cdev_write(&serial_device, token.buf, token.req_bytes, &write_callback, &token) < 0) {
         printf("Error writing to UART\n");
         return false;
