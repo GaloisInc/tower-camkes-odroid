@@ -105,11 +105,11 @@ write_callback(ps_chardevice_t* device, enum chardev_status stat,
     t = (struct uart_token*) token;
     t->cur_bytes += bytes_transfered;
     if (t->cur_bytes == t->req_bytes) {
-      //XXX	uart_completed_write_void();
+      uart_Output_recv_resp_0_write_bool(true);
     }
 }
 
-bool uart_write(const Data_Types__ivory_string_UartPacket_impl *packet) {
+bool Input_send_write_Data_Types__ivory_string_UartPacket_impl(const Data_Types__ivory_string_UartPacket_impl *packet) {
     struct uart_token token;
 
     token.cur_bytes = 0;
