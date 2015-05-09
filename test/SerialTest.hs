@@ -29,7 +29,7 @@ import Ivory.Stdlib
 import Ivory.Tower
 import Tower.AADL
 import qualified Ivory.Tower.HAL.Bus.Interface as I
-import Tower.Odroid.Serial
+import Tower.Odroid.UART
 
 --------------------------------------------------------------------------------
 
@@ -50,33 +50,27 @@ testSerial = do
     handler per "periodicHandler" $ do
       e <- emitter (I.backpressureTransmit b) 1 -- Send to wrapper
       callback $ \_msg -> do
-         call_ send packet c
-         emit e (constRef packet)
+        for 5 $ \ix -> do
+          let arr = packet ~> stringDataL
+          c' <- deref c
+          store (arr!ix) c'
+          call_ printf2 "Sending code: 0x%x --> %c\n" c' c'
+          ifte_ (c' >? 90) -- 'Z'
+                (store c 65)
+                (c += 1)
+        store (packet ~> stringLengthL) 5
+        call_ printf0 "Sent!\n"
+        emit e (constRef packet)
+
+    handler (I.backpressureComplete b) "resp" $ do
+      callback $ \_msg -> do
+        call_ printf0 "Received response.\n"
 
   monitor "receiver" $ do
     handler o "receiverHandler" $ do
       callback $ \msg -> do -- Receive from wrapper
-        call_ receive msg
-
--- user_sender.c
-send :: Def('[Ref s (Struct "ivory_string_UartPacket"), Ref s (Stored Uint8)] :-> ())
-send = proc "send" $ \packet c -> body $ do
-  for 5 $ \ix -> do
-    let arr = packet ~> stringDataL
-    c' <- deref c
-    store (arr!ix) c'
-    call_ printf2 "Sending code: 0x%x --> %c\n" c' c'
-    ifte_ (c' >? 90) -- 'Z'
-          (store c 65)
-          (c += 1)
-  store (packet ~> stringLengthL) 5
-  call_ printf0 "Sent!\n"
-
--- user_receiver.c
-receive :: Def('[ConstRef s (Stored Uint8)] :-> ())
-receive = proc "receive" $ \input -> body $ do
-  d <- deref input
-  call_ printf1 "Received input: %c\n" d
+        d <- deref msg
+        call_ printf1 "Received input: %c\n" d
 
 --------------------------------------------------------------------------------
 -- Compiler
@@ -104,10 +98,8 @@ import (stdio.h, printf) void printf2(string x, uint8_t y, uint8_t z)
 |]
 
 towerDepModule :: Module
-towerDepModule = package "towerDeps" $ do
+towerDepModule = package "towerDeps" $ uartModule >> do
   incl printf0
   incl printf1
   incl printf2
-  incl send
-  incl receive
   depend uartModule
