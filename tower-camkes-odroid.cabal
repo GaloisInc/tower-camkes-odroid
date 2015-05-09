@@ -9,7 +9,6 @@ cabal-version:       >= 1.10
 license:             BSD3
 data-files: data/uart/components/uart/uart.camkes,
             data/uart/components/uart/src/driver.c
-            data/uart/interfaces/uart_monitor.idl4
 source-repository    this
   type:     git
   location: https://github.com/GaloisInc/tower-camkes-odroid
