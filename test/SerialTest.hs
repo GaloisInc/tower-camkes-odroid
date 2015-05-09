@@ -98,7 +98,7 @@ import (stdio.h, printf) void printf2(string x, uint8_t y, uint8_t z)
 |]
 
 towerDepModule :: Module
-towerDepModule = package "towerDeps" $ uartModule >> do
+towerDepModule = package "towerDeps" $ do
   incl printf0
   incl printf1
   incl printf2

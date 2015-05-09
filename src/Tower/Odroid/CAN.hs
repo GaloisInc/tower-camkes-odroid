@@ -19,8 +19,9 @@
 --------------------------------------------------------------------------------
 
 module Tower.Odroid.CAN
-  ( canTower
-  , canConfig
+  ( -- canTower
+  -- , 
+    canConfig
   , canModule
   ) where
 
@@ -35,10 +36,32 @@ import qualified Paths_tower_camkes_odroid as P
 
 --------------------------------------------------------------------------------
 
-canTower :: Tower e ( I.BackpressureTransmit s (Stored IBool)
-                     , ChanOutput (Stored Uint8))
-canTower
- = do undefined
+[ivory|
+struct can_message
+  { uint32_t  id
+  ; uint8_t   dlc
+  ;uint8_t[8] can_payload
+  }
+|]
+
+-- canTower :: Tower e ( ChanOutput (Struct "can_message")
+--                     , I.AbortableTransmit (Struct "can_message") (Stored IBool)
+--                     , I.AbortableTransmit (Struct "can_message") (Stored IBool)
+--                     , I.AbortableTransmit (Struct "can_message") (Stored IBool)
+--                     )
+-- canTower
+--   = do
+--   towerModule  canModule
+--   towerDepends canModule
+
+--   -- From sender to wrapper
+--   req_chan  <- channel
+--   -- Response
+--   resp_chan <- channel
+--   -- Received byte
+--   rx_chan   <- channel
+
+--   return undefined
 
 canConfig :: A.Config
 canConfig = A.initialConfig
@@ -48,8 +71,8 @@ canConfig = A.initialConfig
   }
 
 canModule :: Module
-canModule = package "towerCanDeps" $ undefined
---  defStruct (Proxy :: Proxy "ivory_string_UartPacket")
+canModule = package "towerCanDeps" $ 
+  defStruct (Proxy :: Proxy "can_message")
 
 canArtifacts :: [R.Artifact]
 canArtifacts = []
