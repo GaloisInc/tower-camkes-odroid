@@ -8,7 +8,52 @@ build-type:          Simple
 cabal-version:       >= 1.10
 license:             BSD3
 data-files: data/uart/components/uart/uart.camkes,
-            data/uart/components/uart/src/driver.c
+            data/uart/components/uart/src/driver.c,
+            --
+            data/can/include/can_inf.h,
+            data/can/include/common.h,
+            data/can/include/spi_inf.h,
+            data/can/include/utils.h,
+            --
+--            data/can/components/can/include/can_inf.h,
+--            data/can/components/can/include/common.h,
+--            data/can/components/can/include/spi_inf.h,
+--            data/can/components/can/include/utils.h,
+            --
+            data/can/components/can/can.camkes,
+            -- data/can/components/can/include/can_inf.h,
+            -- data/can/components/can/include/common.h,
+            data/can/components/can/include/mcp2515.h,
+            data/can/components/can/include/queue.h,
+--            data/can/components/can/include/spi_inf.h,
+            --
+            data/can/components/can/src/controller.c,
+            data/can/components/can/src/dev.c,
+            data/can/components/can/src/irq.c,
+            data/can/components/can/src/prio.c,
+            data/can/components/can/src/queue.c,
+            data/can/components/can/src/spi_cmd.c,
+            --
+            data/can/components/can_node/can_node.camkes,
+--            data/can/components/can_node/include/can_inf.h,
+--            data/can/components/can_node/include/smaccm_can_node.h,
+            data/can/components/can_node/src/can_node.c,
+            --
+            data/can/components/clk/clk.camkes,
+            -- data/can/components/clk/include/common.h,
+            -- data/can/components/clk/include/utils.h,
+            data/can/components/clk/src/clk.c,
+            --
+            data/can/components/gpio/gpio.camkes,
+--            data/can/components/gpio/include/periph.h,
+            data/can/components/gpio/src/gpio.c,
+            --
+            data/can/components/spi/spi.camkes,
+            -- data/can/components/spi/include/common.h,
+            -- data/can/components/spi/include/spi_inf.h,
+            -- data/can/components/spi/include/utils.h,
+            data/can/components/spi/src/spi.c
+
 source-repository    this
   type:     git
   location: https://github.com/GaloisInc/tower-camkes-odroid
@@ -36,6 +81,22 @@ library
 executable serial-test
   hs-source-dirs:   test
   main-is:          SerialTest.hs
+  build-depends: base >= 4.6
+               , ivory >= 0.1.0.1
+               , ivory-stdlib
+               , tower
+               , tower-aadl
+               , tower-hal
+               , tower-camkes-odroid
+  default-language: Haskell2010
+  if impl(ghc >= 7.8)
+    ghc-options:        -Wall -fhpc -fplugin=Ivory.Tower.SrcLoc.Plugin -fplugin-opt=Ivory.Tower.SrcLoc.Plugin:kill-foreign-stubs
+  else
+    ghc-options:        -Wall
+
+executable can-test
+  hs-source-dirs:   test
+  main-is:          CANTest.hs
   build-depends: base >= 4.6
                , ivory >= 0.1.0.1
                , ivory-stdlib
