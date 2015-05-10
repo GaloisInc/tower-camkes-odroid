@@ -22,7 +22,6 @@
 module Main where
 
 import System.Environment
-import Data.Maybe
 
 import Ivory.Language
 import Ivory.Stdlib
@@ -79,15 +78,7 @@ main :: IO ()
 main = do
   args <- getArgs
   opts <- parseOpts args
-  runCompileAADL
-    opts  { genDirOpts = if isNothing (genDirOpts opts)
-                           then Just "out/testUart"
-                           else genDirOpts opts
-          }
-    uartConfig
-    testSerial
-
-  where
+  runCompileAADL opts uartConfig testSerial
 
 --------------------------------------------------------------------------------
 -- Helpers
