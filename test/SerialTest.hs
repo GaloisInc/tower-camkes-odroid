@@ -83,10 +83,11 @@ main = do
     opts  { genDirOpts = if isNothing (genDirOpts opts)
                            then Just "out/testUart"
                            else genDirOpts opts
-          , configOpts =
-              uartConfig `appendArtifacts` configOpts opts
           }
+    uartConfig
     testSerial
+
+  where
 
 --------------------------------------------------------------------------------
 -- Helpers

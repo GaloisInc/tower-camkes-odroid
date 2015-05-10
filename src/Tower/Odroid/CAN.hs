@@ -67,7 +67,6 @@ canConfig :: A.Config
 canConfig = A.initialConfig
   { A.configSystemHW  = A.ODROID
   , A.configSystemOS  = A.CAmkES
-  , A.configArtifacts = canArtifacts
   }
 
 canModule :: Module
