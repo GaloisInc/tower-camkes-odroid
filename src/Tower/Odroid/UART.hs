@@ -78,7 +78,7 @@ wrapperMonitor req_chanRx resp_chanTx rx_chanTx = do
 
   externalMonitor uart $ do
 
-    -- Rx from sender, define a symbol for handling msg, but don't implement it.
+    -- Now just pass through values from driver.
     handler req_chanRx "send" $ do
       e <- emitter (fst req_chan) 1
       callback $ \msg ->
