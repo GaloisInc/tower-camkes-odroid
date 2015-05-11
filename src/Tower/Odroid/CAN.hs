@@ -128,8 +128,9 @@ canModule = package "towerCanDeps" $
 
 canArtifacts :: [R.Artifact]
 canArtifacts =
---     a other other
-     map (a "include") (mkHdr include)
+     a "" other
+   : map (a "include") (mkHdr include)
+  ++ map (a "interfaces") (mkIdl ["can_tx", "can_rx"])
   ++ concatMap (uncurry putComponents)
       [ ("can", can)
       , ("can_node", can_node)
@@ -137,10 +138,13 @@ canArtifacts =
       , ("gpio", gpio)
       , ("spi", spi)
       ]
---  where other = "othercamkestargets.mk"
+  where other = "othercamkestargets.mk"
 
 mkC :: [String] -> [FilePath]
 mkC = map (<.> ".c")
+
+mkIdl :: [String] -> [FilePath]
+mkIdl = map (<.> ".idl4")
 
 mkHdr :: [String] -> [FilePath]
 mkHdr = map (<.> ".h")
@@ -184,14 +188,14 @@ can = (,)
   ]
   [ "mcp2515"
   , "queue"
+  , "can_inf"
   ]
 
 can_node = (,)
   [ "can_node"
---  , "smaccm_can_node"
-  ] []
-  -- [ "smaccm_can_node"
-  -- ]
+  ]
+  [ "can_inf"
+  ]
 
 clk = ([ "clk" ], [])
 

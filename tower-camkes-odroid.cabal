@@ -10,18 +10,17 @@ license:             BSD3
 data-files: data/uart/components/uart/uart.camkes,
             data/uart/components/uart/src/driver.c,
             --
+            --
+            data/can/othercamkestargets.mk,
+            data/can/interfaces/can_tx.idl4,
+            data/can/interfaces/can_rx.idl4,
             data/can/include/can_inf.h,
             data/can/include/common.h,
             data/can/include/spi_inf.h,
             data/can/include/utils.h,
             --
---            data/can/components/can/include/can_inf.h,
---            data/can/components/can/include/common.h,
---            data/can/components/can/include/spi_inf.h,
---            data/can/components/can/include/utils.h,
-            --
             data/can/components/can/can.camkes,
-            -- data/can/components/can/include/can_inf.h,
+            data/can/components/can/include/can_inf.h,
             -- data/can/components/can/include/common.h,
             data/can/components/can/include/mcp2515.h,
             data/can/components/can/include/queue.h,
@@ -35,7 +34,7 @@ data-files: data/uart/components/uart/uart.camkes,
             data/can/components/can/src/spi_cmd.c,
             --
             data/can/components/can_node/can_node.camkes,
---            data/can/components/can_node/include/can_inf.h,
+            data/can/components/can_node/include/can_inf.h,
 --            data/can/components/can_node/include/smaccm_can_node.h,
             data/can/components/can_node/src/can_node.c,
             --

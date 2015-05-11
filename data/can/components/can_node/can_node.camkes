@@ -5,29 +5,23 @@ import "../gpio/gpio.camkes";
 import "../spi/spi.camkes";
 import "../can/can.camkes";
 
-import "../../interfaces/can__can_frame_i_writer.idl4";
+import "../../interfaces/Data_Types__can_message_impl_writer.idl4";
 
 component can_node {
     control;
 
     // AADL interface
-    include "smaccm_wrapper_i_types.h";
-    uses can__can_frame_i_writer can_node_recv;
+    include "smaccm_sys_impl_types.h";
+    uses Data_Types__can_message_impl_writer can_node_Output_recvHandler_0;
 
-    uses bool_writer can_node_status_0;
-    uses bool_writer can_node_status_1;
-    uses bool_writer can_node_status_2;
+    uses bool_writer can_node_Output_statusHandler_0;
     has semaphore status_0_semaphore;
     has semaphore status_1_semaphore;
     has semaphore status_2_semaphore;
 
-    provides void_writer abort_0;
-    provides void_writer abort_1;
-    provides void_writer abort_2;
+    provides bool_writer Input_abortHandler;
 
-    provides can__can_frame_i_writer send_0;
-    provides can__can_frame_i_writer send_1;
-    provides can__can_frame_i_writer send_2;
+    provides Data_Types__can_message_impl_writer Input_sender0;
 
     // Driver interface
     uses can_tx_inf can_tx;
