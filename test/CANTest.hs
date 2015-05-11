@@ -37,7 +37,7 @@ testCAN = do
   towerModule  towerDepModule
   towerDepends towerDepModule
 
-  (o, a0, _a1, _a2) <- canTower
+  (o, a) <- canTower
   per <- period (1000`ms`)
 
   monitor "sender" $ do
@@ -45,8 +45,8 @@ testCAN = do
     id_cnt <- stateInit "id" izero
 
     handler per "sendHandler" $ do
-      reqChan   <- emitter (I.abortableTransmit a0) 1
-      abortChan <- emitter (I.abortableAbort a0) 1
+      reqChan   <- emitter (I.abortableTransmit a) 1
+      abortChan <- emitter (I.abortableAbort a) 1
       callback $ \_per -> do
         am <- deref abort_mode
         ifte_ am
@@ -57,6 +57,7 @@ testCAN = do
                ic <- deref id_cnt
                store (frame~>can_id) ic
                id_cnt += 1
+               store (frame~>can_dlc) 8
                arrayMap $ \ix -> do
                  let v = castDefault (fromIx ix) + 1
                  store ((frame~>can_payload)!ix) v
@@ -72,7 +73,7 @@ testCAN = do
           )
         abort_mode %= iNot
 
-    handler (I.abortableComplete a0) "statusHandler" $ do
+    handler (I.abortableComplete a) "statusHandler" $ do
       callback $ \msg -> do
         b <- deref msg
         call_ printfb "Sender received status: %u\n" b
