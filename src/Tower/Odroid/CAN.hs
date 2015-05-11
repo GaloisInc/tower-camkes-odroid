@@ -35,7 +35,6 @@ import           Ivory.Artifact as R
 import qualified Tower.AADL     as A
 import           Ivory.Tower.HAL.Bus.Interface
 
-import           Control.Monad
 import           System.FilePath
 import qualified Paths_tower_camkes_odroid as P
 
@@ -44,19 +43,14 @@ import qualified Paths_tower_camkes_odroid as P
 -- Corresponds to the can_message struct in tower-hal.
 [ivory|
 struct can_message
-  { uint32_t  can_id -- can_message_id  :: Stored CANArbitrationField
-  ; uint8_t   can_dlc -- can_message_len :: Stored (Ix 9)
-  ;uint8_t[8] can_payload -- can_message_buf :: Array 8 (Stored Uint8)
+  { uint32_t  can_id      -- can_message_id  :: Stored CANArbitrationField
+  ; uint8_t   can_dlc     -- can_message_len :: Stored (Ix 9)
+  ; uint8_t[8] can_payload -- can_message_buf :: Array 8 (Stored Uint8)
   }
 |]
 
-mailboxes :: Int
-mailboxes = 3
-
 canTower ::
   Tower e ( ChanOutput (Struct "can_message")
-          , AbortableTransmit (Struct "can_message") (Stored IBool)
-          , AbortableTransmit (Struct "can_message") (Stored IBool)
           , AbortableTransmit (Struct "can_message") (Stored IBool)
           )
 canTower
@@ -68,39 +62,31 @@ canTower
   -- reciver to driver
   recvW <- channel
 
-  let idxs = [0 .. mailboxes]
-  allChans <- replicateM mailboxes $ do
-                send   <- channel
-                abort  <- channel
-                status <- channel
-                return (send, abort, status)
+  send   <- channel
+  abort  <- channel
+  status <- channel
 
-  let toWrapperChans (send, abort, status) =
-        (snd send, snd abort, fst status)
+  let toWrapperChans = (snd send, snd abort, fst status)
 
-  let allWrapperChans = map toWrapperChans allChans
-  handlers <- mapM perMailboxHandlers $ zip allWrapperChans idxs
+  handlers <- perMailboxHandlers toWrapperChans
 
   externalMonitor "can_node" $ do
-    sequence_ (concat handlers)
+    sequence_ handlers
     handler (snd recvW) "recvHandler" $ do
       e <- emitter (fst recv) 1
       callback $ \msg ->
         emit e msg
 
-  let as (send, abort, status) =
-        AbortableTransmit (fst send) (fst abort) (snd status)
-  let [a0, a1, a2] = map as allChans
-  return (snd recv, a0, a1, a2)
+  let as = AbortableTransmit (fst send) (fst abort) (snd status)
+  return (snd recv, as)
 
 perMailboxHandlers ::
-  ( ( ChanOutput (Struct "can_message")
-    , ChanOutput (Stored IBool)
-    , ChanInput  (Stored IBool)
-   ), Int
+  ( ChanOutput (Struct "can_message")
+  , ChanOutput (Stored IBool)
+  , ChanInput  (Stored IBool)
   )
   -> Tower e [Monitor e0 ()]
-perMailboxHandlers ((sendRx, abortRx, statusTx), i) = do
+perMailboxHandlers (sendRx, abortRx, statusTx) = do
 
   -- To driver channels
   sendW   <- channel
@@ -110,23 +96,21 @@ perMailboxHandlers ((sendRx, abortRx, statusTx), i) = do
   return
     [
       -- Make the passthroughs.
-      handler sendRx (idx "sender") $ do
+      handler sendRx "sender" $ do
         e <- emitter (fst sendW) 1
         callback $ \msg ->
           emit e msg
 
-    , handler abortRx (idx "abortHandler") $ do
+    , handler abortRx "abortHandler" $ do
         e <- emitter (fst abortW) 1
         callback $ \msg ->
           emit e msg
 
-    , handler (snd statusW) (idx "statusHandler") $ do
+    , handler (snd statusW) "statusHandler" $ do
         e <- emitter statusTx 1
         callback $ \msg ->
           emit e msg
     ]
-  where
-  idx s = s ++ show i
 
 canConfig :: A.Config
 canConfig = A.initialConfig
@@ -144,7 +128,8 @@ canModule = package "towerCanDeps" $
 
 canArtifacts :: [R.Artifact]
 canArtifacts =
-  map (a "include") (mkHdr include)
+--     a other other
+     map (a "include") (mkHdr include)
   ++ concatMap (uncurry putComponents)
       [ ("can", can)
       , ("can_node", can_node)
@@ -152,6 +137,7 @@ canArtifacts =
       , ("gpio", gpio)
       , ("spi", spi)
       ]
+--  where other = "othercamkestargets.mk"
 
 mkC :: [String] -> [FilePath]
 mkC = map (<.> ".c")
