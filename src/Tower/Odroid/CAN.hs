@@ -130,7 +130,7 @@ canArtifacts :: [R.Artifact]
 canArtifacts =
      a "" other
    : map (a "include") (mkHdr include)
-  ++ map (a "interfaces") (mkIdl ["can_tx", "can_rx"])
+  ++ map (a "interfaces") (mkIdl interfaces)
   ++ concatMap (uncurry putComponents)
       [ ("can", can)
       , ("can_node", can_node)
@@ -168,6 +168,9 @@ dataDir = "data/can"
 a :: FilePath -> FilePath -> Artifact
 a d f = R.artifactPath d
       $ R.artifactCabalFile P.getDataDir (dataDir </> d </> f)
+
+interfaces :: [String]
+interfaces = ["can_tx", "can_rx", "gpio", "clk", "spi"]
 
 include :: [String]
 include =

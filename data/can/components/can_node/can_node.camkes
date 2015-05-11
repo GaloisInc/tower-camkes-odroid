@@ -21,7 +21,7 @@ component can_node {
 
     provides bool_writer Input_abortHandler;
 
-    provides Data_Types__can_message_impl_writer Input_sender0;
+    provides Data_Types__can_message_impl_writer Input_sender;
 
     // Driver interface
     uses can_tx_inf can_tx;
