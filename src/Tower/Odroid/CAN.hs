@@ -75,14 +75,18 @@ canTower
                 status <- channel
                 return (send, abort, status)
 
-  let hs = perMailboxHandlers (fst recv) recvW
   let toWrapperChans (send, abort, status) =
         (snd send, snd abort, fst status)
 
   let allWrapperChans = map toWrapperChans allChans
-  handlers <- mapM hs (zip allWrapperChans idxs)
+  handlers <- mapM perMailboxHandlers $ zip allWrapperChans idxs
 
-  externalMonitor "can_node" $ sequence_ (concat handlers)
+  externalMonitor "can_node" $ do
+    sequence_ (concat handlers)
+    handler (snd recvW) "recvHandler" $ do
+      e <- emitter (fst recv) 1
+      callback $ \msg ->
+        emit e msg
 
   let as (send, abort, status) =
         AbortableTransmit (fst send) (fst abort) (snd status)
@@ -90,18 +94,13 @@ canTower
   return (snd recv, a0, a1, a2)
 
 perMailboxHandlers ::
-     ChanInput (Struct "can_message")
-  -> ( ChanInput  (Struct "can_message")
-     , ChanOutput (Struct "can_message")
-     )
-  -> ( ( ChanOutput (Struct "can_message")
-       , ChanOutput (Stored IBool)
-       , ChanInput  (Stored IBool)
-       )
-     , Int
-     )
+  ( ( ChanOutput (Struct "can_message")
+    , ChanOutput (Stored IBool)
+    , ChanInput  (Stored IBool)
+   ), Int
+  )
   -> Tower e [Monitor e0 ()]
-perMailboxHandlers recvTx recvW ((sendRx, abortRx, statusTx), i) = do
+perMailboxHandlers ((sendRx, abortRx, statusTx), i) = do
 
   -- To driver channels
   sendW   <- channel
@@ -123,11 +122,6 @@ perMailboxHandlers recvTx recvW ((sendRx, abortRx, statusTx), i) = do
 
     , handler (snd statusW) (idx "statusHandler") $ do
         e <- emitter statusTx 1
-        callback $ \msg ->
-          emit e msg
-
-    , handler (snd recvW) (idx "recvHandler") $ do
-        e <- emitter recvTx 1
         callback $ \msg ->
           emit e msg
     ]
