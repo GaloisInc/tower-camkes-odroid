@@ -44,7 +44,7 @@ testSerial = do
 
   monitor "sender" $ do
     c <- stateInit "charState" (ival 65) -- 'A'
-    packet <- stateInit "packet" izero
+    packet <- stateInit "packet" (izero :: Init UartPacket)
 
     handler per "periodicHandler" $ do
       e <- emitter (I.backpressureTransmit b) 1 -- Send to wrapper
