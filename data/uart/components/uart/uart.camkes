@@ -3,7 +3,6 @@ import "../../interfaces/uint8_t_writer.idl4";
 import "../../interfaces/bool_writer.idl4";
 import "../../interfaces/void_writer.idl4";
 import "../../interfaces/Data_Types__ivory_string_UartPacket_impl_writer.idl4";
-import "../../interfaces/receiver_interface.idl4";
 
 component uart {
   control;

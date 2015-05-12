@@ -81,8 +81,7 @@ wrapperMonitor req_chanRx resp_chanTx rx_chanTx = do
     -- Now just pass through values from driver.
     handler req_chanRx "send" $ do
       e <- emitter (fst req_chan) 1
-      callback $ \msg ->
-        emit e msg
+      callback $ \msg -> emit e msg
 
     handler (snd rx_chan) "recv_rx" $ do
       e <- emitter rx_chanTx 1
