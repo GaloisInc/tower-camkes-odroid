@@ -47,8 +47,8 @@ bool sendit(int txb_idx, const Data_Types__can_message_impl *a_frame) {
   if (   a_frame->can_message_id >= (1 << 29)
          || a_frame->can_message_len > 8
          || txb_idx != 0 // only send to mailbox 0
-         || (a_frame~>can_message_id & 1) // extended frames off
-         || (a_frame~>can_message_id & 2) // remote frames off
+         || (a_frame->can_message_id & 1) // extended frames off
+         || (a_frame->can_message_id & 2) // remote frames off
          ) {
 	// TODO: Should fail with error if this happens
 	printf("Critical error: bad frame from user code\n");
