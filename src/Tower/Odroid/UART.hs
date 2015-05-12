@@ -20,7 +20,6 @@
 
 module Tower.Odroid.UART
   ( uartTower
-  , uartConfig
   , uartModule
   , UartPacket
   ) where
@@ -29,7 +28,6 @@ import           Ivory.Tower
 import           Ivory.Language
 import           Ivory.Stdlib
 import           Ivory.Artifact as R
-import qualified Tower.AADL     as A
 import qualified Ivory.Tower.HAL.Bus.Interface as I
 
 import           System.FilePath
@@ -51,6 +49,7 @@ uartTower
   = do
   towerModule  uartModule
   towerDepends uartModule
+  mapM_ towerArtifact uartArtifacts
 
   -- From sender to wrapper
   req_chan  <- channel
@@ -107,13 +106,6 @@ wrapperMonitor req_chanRx resp_chanTx rx_chanTx = do
 uartModule :: Module
 uartModule = package "towerUartDeps" $
   defStruct (Proxy :: Proxy "ivory_string_UartPacket")
-
-uartConfig :: A.Config
-uartConfig = A.initialConfig
-  { A.configSystemHW  = A.ODROID
-  , A.configSystemOS  = A.CAmkES
-  , A.configArtifacts = uartArtifacts
-  }
 
 uartArtifacts :: [R.Artifact]
 uartArtifacts =

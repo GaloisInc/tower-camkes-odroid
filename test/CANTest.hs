@@ -21,8 +21,6 @@
 
 module Main where
 
-import System.Environment
-
 import Ivory.Language
 import Ivory.Stdlib
 import Ivory.Tower
@@ -100,10 +98,8 @@ testCAN = do
 -- Compiler
 
 main :: IO ()
-main = do
-  args <- getArgs
-  opts <- parseOpts args
-  runCompileAADL opts canConfig testCAN
+main = compileTowerAADL id p testCAN
+  where p _ = return defaultAADLConfig { configSystemHW = ODROID }
 
 --------------------------------------------------------------------------------
 -- Helpers

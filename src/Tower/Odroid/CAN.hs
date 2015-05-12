@@ -21,14 +21,12 @@
 module Tower.Odroid.CAN
   ( canTower
   , canArtifacts
-  , canConfig
   , canModule
   ) where
 
 import           Ivory.Tower
 import           Ivory.Language
 import           Ivory.Artifact as R
-import qualified Tower.AADL     as A
 import           Ivory.Tower.HAL.Bus.CAN
 import           Ivory.Tower.HAL.Bus.Interface
 
@@ -100,12 +98,6 @@ perMailboxHandlers (sendRx, abortRx, statusTx) = do
           emit e msg
     ]
 
-canConfig :: A.Config
-canConfig = A.initialConfig
-  { A.configSystemHW  = A.ODROID
-  , A.configSystemOS  = A.CAmkES
-  , A.configArtifacts = canArtifacts
-  }
 
 canModule :: Module
 canModule = canDriverTypes

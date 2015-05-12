@@ -10,11 +10,11 @@ test: can-test
 
 .PHONY: serial-test
 serial-test:
-	cabal run serial-test -- --out-dir=serial_test_out
+	cabal run serial-test -- --src-dir=serial_test_out
 
 .PHONY: can-test
 can-test:
-	cabal run can-test -- --out-dir=can_test_out
+	cabal run can-test -- --src-dir=can_test_out
 
 
 # Eventially in Travis we want to make rameses, too...

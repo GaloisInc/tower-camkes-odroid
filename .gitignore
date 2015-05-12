@@ -1,4 +1,7 @@
 RAMSES_PATH
 .cabal-sandbox
+.hpc
 cabal.sandbox.config
 dist
+can_test_out
+serial_test_out

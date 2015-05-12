@@ -21,8 +21,6 @@
 
 module Main where
 
-import System.Environment
-
 import Ivory.Language
 import Ivory.Stdlib
 import Ivory.Tower
@@ -75,10 +73,8 @@ testSerial = do
 -- Compiler
 
 main :: IO ()
-main = do
-  args <- getArgs
-  opts <- parseOpts args
-  runCompileAADL opts uartConfig testSerial
+main = compileTowerAADL id p testSerial
+  where p _ = return defaultAADLConfig { configSystemHW = ODROID }
 
 --------------------------------------------------------------------------------
 -- Helpers
