@@ -23,31 +23,19 @@ module Tower.Odroid.CAN
   , canArtifacts
   , canConfig
   , canModule
-  -- Can message fields
-  , can_id
-  , can_dlc
-  , can_payload
   ) where
 
 import           Ivory.Tower
 import           Ivory.Language
 import           Ivory.Artifact as R
 import qualified Tower.AADL     as A
+import           Ivory.Tower.HAL.Bus.CAN
 import           Ivory.Tower.HAL.Bus.Interface
 
 import           System.FilePath
 import qualified Paths_tower_camkes_odroid as P
 
 --------------------------------------------------------------------------------
-
--- Corresponds to the can_message struct in tower-hal.
-[ivory|
-struct can_message
-  { uint32_t  can_id      -- can_message_id  :: Stored CANArbitrationField
-  ; uint8_t   can_dlc     -- can_message_len :: Stored (Ix 9)
-  ; uint8_t[8] can_payload -- can_message_buf :: Array 8 (Stored Uint8)
-  }
-|]
 
 canTower ::
   Tower e ( ChanOutput (Struct "can_message")
@@ -120,8 +108,7 @@ canConfig = A.initialConfig
   }
 
 canModule :: Module
-canModule = package "towerCanDeps" $
-  defStruct (Proxy :: Proxy "can_message")
+canModule = canDriverTypes
 
 --------------------------------------------------------------------------------
 -- Artifacts

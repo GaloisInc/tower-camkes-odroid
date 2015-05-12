@@ -27,6 +27,7 @@ import Ivory.Language
 import Ivory.Stdlib
 import Ivory.Tower
 import Tower.AADL
+import qualified Ivory.Tower.HAL.Bus.CAN as I
 import qualified Ivory.Tower.HAL.Bus.Interface as I
 import Tower.Odroid.CAN
 
@@ -55,17 +56,17 @@ testCAN = do
           )
           ( do frame <- local (istruct [])
                ic <- deref id_cnt
-               store (frame~>can_id) ic
+               store (frame~>I.can_message_id) (I.standardCANID (fromRep ic) (fromRep 0))
                id_cnt += 1
-               store (frame~>can_dlc) 8
+               store (frame~>I.can_message_len) 8
                arrayMap $ \ix -> do
                  let v = castDefault (fromIx ix) + 1
-                 store ((frame~>can_payload)!ix) v
+                 store ((frame~>I.can_message_buf)!ix) v
                emit reqChan (constRef frame)
-               i <- frame~>*can_id
+               i <- getStandardID frame
                call_ printf32 "Sent can frame with id %d, payload: " i
                arrayMap $ \ix -> do
-                 p <- deref $ (frame~>can_payload)!ix
+                 p <- deref $ (frame~>I.can_message_buf)!ix
                  call_ printf8 "0x%02x " p
                call_ printf "\n"
                ic' <- deref id_cnt
@@ -81,12 +82,19 @@ testCAN = do
   monitor "receiver"$ do
     handler o "rx_handler" $ do
       callback $ \frame -> do
-        i <- deref (frame ~> can_id)
+        i <- getStandardID frame
         call_ printf32 "Recieved can frame with id %d, payload: " i
         arrayMap $ \ix -> do
-          p <- deref $ (frame ~> can_payload)!ix
+          p <- deref $ (frame ~> I.can_message_buf)!ix
           call_ printf8 "0x%02x " p
         call_ printf "\n"
+
+  where
+  getStandardID frame = do
+    arb <- frame ~>* I.can_message_id
+    assert $ iNot $ bitToBool $ arb #. I.can_arbitration_ide
+    assert $ iNot $ bitToBool $ arb #. I.can_arbitration_rtr
+    return $ (toRep $ arb #. I.can_arbitration_id) `iShiftR` 18
 
 --------------------------------------------------------------------------------
 -- Compiler
