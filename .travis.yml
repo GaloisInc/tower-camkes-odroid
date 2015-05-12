@@ -8,6 +8,8 @@ install:
   - cabal install cabal-install
   - cabal install alex happy
 script:
+  - make create-sandbox
   - make
+  - make test
 ghc:
   - 7.8

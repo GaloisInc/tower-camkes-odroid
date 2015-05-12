@@ -2,9 +2,7 @@ IVORY_REPO ?= ../ivory
 TOWER_REPO ?= ../tower
 include Makefile.sandbox
 
-default: test
-
-test: create-sandbox
+.PHONY: test
 test: serial-test
 test: can-test
 
