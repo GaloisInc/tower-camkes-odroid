@@ -20,7 +20,6 @@
 
 module Tower.Odroid.CAN
   ( canTower
-  , canArtifacts
   , canModule
   ) where
 
@@ -43,6 +42,7 @@ canTower
   = do
   towerModule  canModule
   towerDepends canModule
+  mapM_ towerArtifact canArtifacts
 
   recv <- channel
   -- reciver to driver
