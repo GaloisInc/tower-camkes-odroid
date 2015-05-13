@@ -26,7 +26,6 @@ module Tower.Odroid.CAN
 import           Ivory.Tower
 import           Ivory.Language
 import           Ivory.Artifact          as R
-import           Ivory.Artifact.Location as R
 import           Ivory.Tower.HAL.Bus.CAN
 import           Ivory.Tower.HAL.Bus.Interface
 

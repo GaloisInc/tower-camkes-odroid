@@ -28,7 +28,6 @@ import           Ivory.Tower
 import           Ivory.Language
 import           Ivory.Stdlib
 import           Ivory.Artifact          as R
-import           Ivory.Artifact.Location as R
 import qualified Ivory.Tower.HAL.Bus.Interface as I
 
 import           System.FilePath
