@@ -52,23 +52,25 @@ uartTower
   towerDepends uartModule
   mapM_ towerArtifact uartArtifacts
 
-  -- From sender to translator
-  req_chan  <- channel
-  -- From translator to wrapper
-  req_chan' <- channel
+  -------- To/From client --------
+  -- Request
+  req_chan0  <- channel
   -- Response
-  resp_chan <- channel
+  resp_chan0 <- channel
   -- Received byte
-  rx_chan   <- channel
+  rx_chan0   <- channel
 
-  -- XXX We make a new monitor since if we just make this a handler in the
-  -- external monitor, then the only channel with the type of an
-  -- "ivory_string_UartPacket" is the outbound channel to the driver. But in
-  -- Tower, channels going nowhere are dropped, so we can't collect its type.
-  monitor "send_transdata" $ do
-    -- Now just pass through values from driver.
-    handler (snd req_chan) "send_translate" $ do
-      e <- emitter (fst req_chan') 1
+  -------- To/From external monitor --------
+  -- Request
+  req_chan1  <- channel
+  -- Response
+  resp_chan1 <- channel
+  -- Received byte
+  rx_chan1   <- channel
+
+  monitor "uart_interface" $ do
+    handler (snd req_chan0) "client_send" $ do
+      e <- emitter (fst req_chan1) 1
       callback $ \msg -> do
         msg' <- local (izero :: Init UartPacket)
         let srccap = arrayLen (msg ~> stringDataL)
@@ -79,9 +81,17 @@ uartTower
         store (msg' ~> stringLengthL) srclen
         emit e $ constRef msg'
 
-  wrapperMonitor (snd req_chan') (fst resp_chan) (fst rx_chan)
+    handler (snd resp_chan1) "client_resp" $ do
+      e <- emitter (fst resp_chan0) 1
+      callback $ \msg -> emit e msg
 
-  return (I.BackpressureTransmit (fst req_chan) (snd resp_chan), snd rx_chan)
+    handler (snd rx_chan1) "client_rx" $ do
+      e <- emitter (fst rx_chan0) 1
+      callback $ \msg -> emit e msg
+
+  wrapperMonitor (snd req_chan1) (fst resp_chan1) (fst rx_chan1)
+
+  return (I.BackpressureTransmit (fst req_chan0) (snd resp_chan0), snd rx_chan0)
 
 -- The wrapper just passes the channel values through to and from the driver.
 wrapperMonitor :: ChanOutput (Struct "ivory_string_UartPacket")
@@ -90,26 +100,26 @@ wrapperMonitor :: ChanOutput (Struct "ivory_string_UartPacket")
                -> Tower e ()
 wrapperMonitor req_chanRx resp_chanTx rx_chanTx = do
 
-  -- From wrapper to driver. We're going to fix it's size to make the AADL
-  -- wrapper easier to maintain.
-  req_chan  <- channel
-  -- Response from driver
-  resp_chan <- channel
+  -------- To/From external driver --------
+  -- Request
+  req_chan1  <- channel
+  -- Response
+  resp_chan1 <- channel
   -- Received byte
-  rx_chan   <- channel
+  rx_chan1   <- channel
 
   externalMonitor uart $ do
 
     -- Now just pass through values from driver.
     handler req_chanRx "send" $ do
-      e <- emitter (fst req_chan) 1
+      e <- emitter (fst req_chan1) 1
       callback $ \msg -> emit e msg
 
-    handler (snd rx_chan) "recv_rx" $ do
+    handler (snd rx_chan1) "recv_rx" $ do
       e <- emitter rx_chanTx 1
       callback $ \msg -> emit e msg
 
-    handler (snd resp_chan) "recv_resp" $ do
+    handler (snd resp_chan1) "recv_resp" $ do
       e <- emitter resp_chanTx 1
       callback $ \msg -> emit e msg
 
