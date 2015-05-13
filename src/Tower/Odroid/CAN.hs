@@ -25,7 +25,8 @@ module Tower.Odroid.CAN
 
 import           Ivory.Tower
 import           Ivory.Language
-import           Ivory.Artifact as R
+import           Ivory.Artifact          as R
+import           Ivory.Artifact.Location as R
 import           Ivory.Tower.HAL.Bus.CAN
 import           Ivory.Tower.HAL.Bus.Interface
 
@@ -105,9 +106,9 @@ canModule = canDriverTypes
 --------------------------------------------------------------------------------
 -- Artifacts
 
-canArtifacts :: [R.Artifact]
-canArtifacts =
-     a "" other
+canArtifacts :: [R.Located R.Artifact]
+canArtifacts = map R.Root
+   $ a "" other
    : map (a "include") (mkHdr include)
   ++ map (a "interfaces") (mkIdl interfaces)
   ++ concatMap (uncurry putComponents)

@@ -27,7 +27,8 @@ module Tower.Odroid.UART
 import           Ivory.Tower
 import           Ivory.Language
 import           Ivory.Stdlib
-import           Ivory.Artifact as R
+import           Ivory.Artifact          as R
+import           Ivory.Artifact.Location as R
 import qualified Ivory.Tower.HAL.Bus.Interface as I
 
 import           System.FilePath
@@ -107,8 +108,8 @@ uartModule :: Module
 uartModule = package "towerUartDeps" $
   defStruct (Proxy :: Proxy "ivory_string_UartPacket")
 
-uartArtifacts :: [R.Artifact]
-uartArtifacts =
+uartArtifacts :: [R.Located R.Artifact]
+uartArtifacts = map R.Root
   [ a compDir (uart <.> "camkes")
   , a srcDir  "driver.c"
   ]
