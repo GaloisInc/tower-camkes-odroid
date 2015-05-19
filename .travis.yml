@@ -1,15 +1,18 @@
 language: haskell
 before_install:
-  - git clone https://github.com/galoisinc/ivory
-  - export IVORY_REPO=$PWD/ivory
-  - git clone https://github.com/galoisinc/tower
-  - export TOWER_REPO=$PWD/tower
+- git clone https://github.com/galoisinc/ivory
+- export IVORY_REPO=$PWD/ivory
+- git clone https://github.com/galoisinc/tower
+- export TOWER_REPO=$PWD/tower
 install:
-  - cabal install cabal-install
-  - cabal install alex happy
+- cabal install cabal-install
+- cabal install alex happy
 script:
-  - make create-sandbox
-  - make
-  - make test
+- make create-sandbox
+- make
+- make test
 ghc:
-  - 7.8
+- 7.8
+notifications:
+  slack:
+    secure: meAyckfvj2cJQyyOHFCwb0dtK+eNIhBPWVICp8L23vbQDs2ps1uo+GGZu0rTwG1skS9y4/tma95ZM3n3PJeLKWl03FVAH17YxNNbTpaIy4YVzqqdksrXfnjvKkmuyAp23PMAEPis6UoKse/oe5V5kWV2DeduhgaZ/9AtGG7UpcM=
