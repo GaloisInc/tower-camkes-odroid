@@ -69,17 +69,7 @@ read_callback(ps_chardevice_t* device, enum chardev_status stat,
     /* We might get a short read due to a timeout. */
     t->cur_bytes += bytes_transfered;
     t->buf += bytes_transfered;
-    if(t->cur_bytes < t->req_bytes){
-        int ret;
-        ret = ps_cdev_read(device, t->buf, t->req_bytes - t->cur_bytes,
-                           &read_callback, token);
-        if(ret < 0){
-            printf("Error reading from UART\n");
-            read_sem_post();
-        }
-    }else{
-        read_sem_post();
-    }
+    read_sem_post();
 }
 
 int uart_read(char *c, int rsize)
@@ -126,13 +116,16 @@ bool Input_send_write_Data_Types__ivory_string_UartPacket_impl(const Data_Types_
 
 int run(void)
 {
-    char c;
-
+    char buf[256];
+    
     while (1) {
-        int r = uart_read(&c, 1);
-        if (r > 0) {
-	    uart_Output_recv_rx_0_write_uint8_t((uint8_t*) &c);
-        }
+	int r = uart_read(&buf, 256);
+	for (int i = 0; i < r; i++) {
+	    bool sent = false;
+	    while (!sent) {
+		sent = uart_Output_recv_rx_0_write_uint8_t((uint8_t*) &(buf[i]));
+	    }
+	}
     }
 
     return 0;
