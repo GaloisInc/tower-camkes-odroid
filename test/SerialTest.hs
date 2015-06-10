@@ -74,7 +74,9 @@ testSerial = do
 
 main :: IO ()
 main = compileTowerAADL id p testSerial
-  where p _ = return defaultAADLConfig { configSystemHW = ODROID }
+  where p _ = return defaultAADLConfig { configSystemHW = ODROID
+                                       , configLibDir   = "ivory_serial"
+                                       }
 
 --------------------------------------------------------------------------------
 -- Helpers
