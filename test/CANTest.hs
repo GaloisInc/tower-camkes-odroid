@@ -99,9 +99,8 @@ testCAN = do
 
 main :: IO ()
 main = compileTowerAADL id p testCAN
-  where p _ = return defaultAADLConfig { configSystemHW = ODROID
-                                       , configLibDir   = "ivory_can"
-                                       }
+  where
+  p _ = return defaultAADLConfig { configSystemHW = ODROID }
 
 --------------------------------------------------------------------------------
 -- Helpers
