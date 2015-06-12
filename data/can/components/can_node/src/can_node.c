@@ -43,12 +43,12 @@ void pre_init(void) {
     printf("Finished setting up CAN node\n");
 }
 
-bool sendit(int txb_idx, const Data_Types__can_message_impl *a_frame) {
-  if (   a_frame->aadl_can_message_id >= (1 << 29)
-         || a_frame->aadl_can_message_len > 8
+bool sendit(int txb_idx, const can_message *a_frame) {
+  if (   a_frame->can_message_id >= (1 << 29)
+         || a_frame->can_message_len > 8
          || txb_idx != 0 // only send to mailbox 0
-         || (a_frame->aadl_can_message_id & 1) // extended frames off
-         || (a_frame->aadl_can_message_id & 2) // remote frames off
+         || (a_frame->can_message_id & 1) // extended frames off
+         || (a_frame->can_message_id & 2) // remote frames off
          ) {
 	// TODO: Should fail with error if this happens
 	printf("Critical error: bad frame from user code\n");
@@ -56,14 +56,14 @@ bool sendit(int txb_idx, const Data_Types__can_message_impl *a_frame) {
     }
 
     can_frame_t d_frame; // Driver frame
-    uint32_t canId = (a_frame->aadl_can_message_id) << 18;;
-    d_frame.ident.id = a_frame->aadl_can_message_id;
+    uint32_t canId = (a_frame->can_message_id) << 18;;
+    d_frame.ident.id = a_frame->can_message_id;
     d_frame.ident.exide = false; // TODO: Support extended IDs
     d_frame.ident.rtr = false;
     d_frame.ident.err = false;
     d_frame.prio = 0;
-    d_frame.dlc = a_frame->aadl_can_message_len;
-    memcpy(d_frame.data, a_frame->aadl_can_message_buf, a_frame->aadl_can_message_len);
+    d_frame.dlc = a_frame->can_message_len;
+    memcpy(d_frame.data, a_frame->can_message_buf, a_frame->can_message_len);
 
     int ret = can_tx_sendto(txb_idx, d_frame);
     if (ret != 0) {
@@ -75,7 +75,7 @@ bool sendit(int txb_idx, const Data_Types__can_message_impl *a_frame) {
     return true;
 }
 
-bool Input_sender_write_Data_Types__can_message_impl(const Data_Types__can_message_impl *a_frame) {
+bool Input_sender_write_can_message(const can_message *a_frame) {
     status_0_semaphore_post();
     return sendit(0, a_frame);
 }
@@ -93,15 +93,15 @@ int run(void) {
 	can_frame_t d_frame; // Driver frame
 	can_rx_recv(&d_frame);
 
-	Data_Types__can_message_impl a_frame; // AADL frame
-	a_frame.aadl_can_message_id = d_frame.ident.id;
-	a_frame.aadl_can_message_len = d_frame.dlc;
-	uint8_t len = a_frame.aadl_can_message_len;
+	can_message a_frame; // AADL frame
+	a_frame.can_message_id = d_frame.ident.id;
+	a_frame.can_message_len = d_frame.dlc;
+	uint8_t len = a_frame.can_message_len;
 	if (len > 8) {
 	    len = 8;
 	}
-	memcpy(a_frame.aadl_can_message_buf, d_frame.data, len);
-	can_node_Output_recvHandler_0_write_Data_Types__can_message_impl(&a_frame);
+	memcpy(a_frame.can_message_buf, d_frame.data, len);
+	can_node_Output_recvHandler_0_write_can_message(&a_frame);
     }
     return 0;
 }
