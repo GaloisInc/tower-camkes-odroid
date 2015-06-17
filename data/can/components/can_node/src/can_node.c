@@ -30,7 +30,6 @@ void txb2_ack_callback(void *arg) {
 }
 
 void pre_init(void) {
-    printf("Setting up CAN node\n");
     can_tx_setup(125000);
 
     txb0_ack_reg_callback(txb0_ack_callback, NULL);
@@ -44,20 +43,32 @@ void pre_init(void) {
 }
 
 bool sendit(int txb_idx, const can_message *a_frame) {
-  if (   a_frame->can_message_id >= (1 << 29)
-         || a_frame->can_message_len > 8
-         || txb_idx != 0 // only send to mailbox 0
-         || (a_frame->can_message_id & 1) // extended frames off
-         || (a_frame->can_message_id & 2) // remote frames off
-         ) {
-	// TODO: Should fail with error if this happens
-	printf("Critical error: bad frame from user code\n");
-	return false;
-    }
+  if ( a_frame->can_message_id >= (1 << 31) ) {
+    printf("Incorrect CAN message ID: %i\n", a_frame->can_message_id);
+    return false;
+  }
+  if ( a_frame->can_message_len > 8 ) {
+    printf("Incorrect CAN message length: %i\n", a_frame->can_message_len);
+    return false;
+  }
+  if ( txb_idx != 0 ) { // only send to mailbox 0
+    printf("Incorrect CAN message mailbox: %i\n", txb_idx);
+    return false;
+  }
+  if ( a_frame->can_message_id & 1 ) { // extended frames off
+    printf("Incorrect CAN extended frame: %i\n", a_frame->can_message_id);
+    return false;
+  }
+  if ( a_frame->can_message_id & 2) { // remote frames off
+    printf("Incorrect CAN remote frame: %i\n", a_frame->can_message_id);
+    return false;
+  }
 
     can_frame_t d_frame; // Driver frame
-    uint32_t canId = (a_frame->can_message_id) << 18;;
-    d_frame.ident.id = a_frame->can_message_id;
+
+    // Right-shift 20: 2 bits to drop flags; 18 to recover 11-bit Ids.
+    d_frame.ident.id = a_frame->can_message_id >> 20;
+
     d_frame.ident.exide = false; // TODO: Support extended IDs
     d_frame.ident.rtr = false;
     d_frame.ident.err = false;
@@ -67,8 +78,8 @@ bool sendit(int txb_idx, const can_message *a_frame) {
 
     int ret = can_tx_sendto(txb_idx, d_frame);
     if (ret != 0) {
-	// TODO: Should fail with error if this happens
-	printf("Critical error: user tried to send without waiting for status\n");
+			// TODO: Should fail with error if this happens
+			printf("Critical error: user tried to send without waiting for status\n");
 	return false;
     }
     
@@ -94,7 +105,7 @@ int run(void) {
 	can_rx_recv(&d_frame);
 
 	can_message a_frame; // AADL frame
-	a_frame.can_message_id = d_frame.ident.id;
+	a_frame.can_message_id = d_frame.ident.id << 20;
 	a_frame.can_message_len = d_frame.dlc;
 	uint8_t len = a_frame.can_message_len;
 	if (len > 8) {
