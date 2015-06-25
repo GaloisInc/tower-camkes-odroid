@@ -6,6 +6,8 @@
 static bool STATIC_TRUE = true;
 static bool STATIC_FALSE = false;
 
+#define MAX_FRAME_LEN 8
+
 void txb0_ack_callback(void *arg) {
     if (status_0_semaphore_trywait() == 0) {
       can_node_Output_statusHandler_0_write_bool(&STATIC_TRUE);
@@ -108,11 +110,12 @@ int run(void) {
 	a_frame.can_message_id = d_frame.ident.id << 20;
 	a_frame.can_message_len = d_frame.dlc;
 	uint8_t len = a_frame.can_message_len;
-	if (len > 8) {
-	    len = 8;
+	if (len > MAX_FRAME_LEN) {
+		printf("Unexpected frame length of %d!\n", len);
+		return 1;
+	} else {
+		memcpy(a_frame.can_message_buf, d_frame.data, len);
+		can_node_Output_recvHandler_0_write_can_message(&a_frame);
+		return 0;
 	}
-	memcpy(a_frame.can_message_buf, d_frame.data, len);
-	can_node_Output_recvHandler_0_write_can_message(&a_frame);
-    }
-    return 0;
 }
