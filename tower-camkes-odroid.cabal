@@ -56,7 +56,8 @@ source-repository    this
 
 library
   exposed-modules: Tower.Odroid.UART,
-                   Tower.Odroid.CAN
+                   Tower.Odroid.CAN,
+                   Tower.Odroid.CameraVM
   build-depends:   base >= 4.6
                  , filepath
                  , ivory >= 0.1.0.2
