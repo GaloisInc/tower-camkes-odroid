@@ -102,20 +102,21 @@ bool Input_abortHandler_write_bool(const bool *x) {
 }
 
 int run(void) {
-    for (;;) {
-	can_frame_t d_frame; // Driver frame
-	can_rx_recv(&d_frame);
+	for (;;) {
+		can_frame_t d_frame; // Driver frame
+		can_rx_recv(&d_frame);
 
-	can_message a_frame; // AADL frame
-	a_frame.can_message_id = d_frame.ident.id << 20;
-	a_frame.can_message_len = d_frame.dlc;
-	uint8_t len = a_frame.can_message_len;
-	if (len > MAX_FRAME_LEN) {
-		printf("Unexpected frame length of %d!\n", len);
-		return 1;
-	} else {
-		memcpy(a_frame.can_message_buf, d_frame.data, len);
-		can_node_Output_recvHandler_0_write_can_message(&a_frame);
-		return 0;
+		can_message a_frame; // AADL frame
+		a_frame.can_message_id = d_frame.ident.id << 20;
+		a_frame.can_message_len = d_frame.dlc;
+		uint8_t len = a_frame.can_message_len;
+		if (len > MAX_FRAME_LEN) {
+			printf("Unexpected frame length of %d!\n", len);
+			return 1;
+		} else {
+			memcpy(a_frame.can_message_buf, d_frame.data, len);
+			can_node_Output_recvHandler_0_write_can_message(&a_frame);
+			return 0;
+		}
 	}
 }
