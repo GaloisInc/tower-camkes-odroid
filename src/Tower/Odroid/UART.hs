@@ -21,6 +21,7 @@
 module Tower.Odroid.UART
   ( uartTower
   , uartModule
+  , uartConfig
   , UartPacket
   ) where
 
@@ -29,6 +30,8 @@ import           Ivory.Language
 import           Ivory.Stdlib
 import           Ivory.Artifact          as R
 import qualified Ivory.Tower.HAL.Bus.Interface as I
+
+import           Tower.AADL.Config
 
 import           System.FilePath
 import qualified Paths_tower_camkes_odroid as P
@@ -129,3 +132,6 @@ uartArtifacts = map R.Root
   uartDir = "data/uart"
   compDir = "components" </> uart
   srcDir  = compDir </> "src"
+
+uartConfig :: AADLConfig
+uartConfig = defaultAADLConfig { configSystemHW = ODROID }

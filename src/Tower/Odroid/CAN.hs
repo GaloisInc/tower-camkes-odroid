@@ -21,6 +21,7 @@
 module Tower.Odroid.CAN
   ( canTower
   , canModule
+  , canConfig
   ) where
 
 import           Ivory.Tower
@@ -28,6 +29,8 @@ import           Ivory.Language
 import           Ivory.Artifact          as R
 import           Ivory.Tower.HAL.Bus.CAN
 import           Ivory.Tower.HAL.Bus.Interface
+
+import           Tower.AADL.Config
 
 import           System.FilePath
 import qualified Paths_tower_camkes_odroid as P
@@ -102,13 +105,17 @@ perMailboxHandlers (sendRx, abortRx, statusTx) = do
 canModule :: Module
 canModule = canDriverTypes
 
+canConfig :: AADLConfig
+canConfig = defaultAADLConfig { configSystemHW       = ODROID
+                              , configCustomMakefile = True
+                              }
+
 --------------------------------------------------------------------------------
 -- Artifacts
 
 canArtifacts :: [R.Located R.Artifact]
 canArtifacts = map R.Root
-   $ a "" other
-   : map (a "include") (mkHdr include)
+   $ map (a "include") (mkHdr include)
   ++ map (a "interfaces") (mkIdl interfaces)
   ++ concatMap (uncurry putComponents)
       [ ("can", can)
@@ -117,7 +124,6 @@ canArtifacts = map R.Root
       , ("gpio", gpio)
       , ("spi", spi)
       ]
-  where other = "othercamkestargets.mk"
 
 mkC :: [String] -> [FilePath]
 mkC = map (<.> ".c")

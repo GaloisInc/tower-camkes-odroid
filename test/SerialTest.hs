@@ -75,7 +75,7 @@ testSerial = do
 main :: IO ()
 main = compileTowerAADL id p testSerial
   where
-  p _ = return defaultAADLConfig { configSystemHW = ODROID }
+  p _ = return uartConfig
 
 --------------------------------------------------------------------------------
 -- Helpers

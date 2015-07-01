@@ -13,8 +13,12 @@ serial-test:
 
 .PHONY: can-test
 can-test:
+	rm -rf can_test_out
+	cp -r test/can_test/can_test_artifacts ./can_test_out
 	cabal run can-test -- --src-dir=can_test_out --lib-dir=ivory_can
 
 .PHONY: camera_vm-test
 camera_vm-test:
+	rm -rf camera_vm_test_out
+	cp -r test/camera_vm/camera_vm_artifacts ./camera_vm_test_out
 	cabal run camera_vm-test -- --src-dir=camera_vm_test_out --lib-dir=camera_vm_tower
