@@ -61,6 +61,7 @@ cameraVMModule = package "towerCameraVMDeps" $
   defStruct (Proxy :: Proxy "bbox")
 
 cameraVMConfig :: AADLConfig
-cameraVMConfig = defaultAADLConfig { configSystemHW      = ODROID
-                                   , configCustomKConfig = True
+cameraVMConfig = defaultAADLConfig { configSystemHW       = ODROID
+                                   , configCustomKConfig  = True
+                                   , configCustomMakefile = True
                                    }
