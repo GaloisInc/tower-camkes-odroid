@@ -11,11 +11,6 @@ data-files: data/uart/components/uart/uart.camkes,
             data/uart/components/uart/src/driver.c,
             --
             --
-            data/camera_vm/othercamkestargets.mk,
-            --
-            --
-            data/can/othercamkestargets.mk,
-            --
             data/can/interfaces/can_tx.idl4,
             data/can/interfaces/can_rx.idl4,
             data/can/interfaces/clk.idl4,
@@ -94,7 +89,7 @@ executable serial-test
     ghc-options:        -Wall
 
 executable can-test
-  hs-source-dirs:   test
+  hs-source-dirs:   test/can_test
   main-is:          CANTest.hs
   build-depends: base >= 4.6
                , ivory >= 0.1.0.1
@@ -110,7 +105,7 @@ executable can-test
     ghc-options:        -Wall
 
 executable camera_vm-test
-  hs-source-dirs:   test
+  hs-source-dirs:   test/camera_vm
   main-is:          CameraVMTest.hs
   build-depends: base >= 4.6
                , ivory >= 0.1.0.1
