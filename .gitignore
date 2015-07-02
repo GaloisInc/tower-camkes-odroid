@@ -1,4 +1,4 @@
-RAMSES_PATH
+RAMSES_PATH.*
 .cabal-sandbox
 .hpc
 cabal.sandbox.config
