@@ -116,7 +116,7 @@ int run(void) {
 		} else {
 			memcpy(a_frame.can_message_buf, d_frame.data, len);
 			can_node_Output_recvHandler_0_write_can_message(&a_frame);
-			return 0;
 		}
 	}
+	return 0;
 }
