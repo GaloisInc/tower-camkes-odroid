@@ -26,14 +26,10 @@ module Tower.Odroid.CAN
 
 import           Ivory.Tower
 import           Ivory.Language
-import           Ivory.Artifact          as R
 import           Ivory.Tower.HAL.Bus.CAN
 import           Ivory.Tower.HAL.Bus.Interface
 
 import           Tower.AADL.Config
-
-import           System.FilePath
-import qualified Paths_tower_camkes_odroid as P
 
 --------------------------------------------------------------------------------
 
@@ -45,7 +41,6 @@ canTower
   = do
   towerModule  canModule
   towerDepends canModule
-  mapM_ towerArtifact canArtifacts
 
   recv <- channel
   -- reciver to driver
@@ -109,85 +104,3 @@ canConfig :: AADLConfig
 canConfig = defaultAADLConfig { configSystemHW       = ODROID
                               , configCustomMakefile = True
                               }
-
---------------------------------------------------------------------------------
--- Artifacts
-
-canArtifacts :: [R.Located R.Artifact]
-canArtifacts = map R.Root
-   $ map (a "include") (mkHdr include)
-  ++ map (a "interfaces") (mkIdl interfaces)
-  ++ concatMap (uncurry putComponents)
-      [ ("can", can)
-      , ("can_node", can_node)
-      , ("clk", clk)
-      , ("gpio", gpio)
-      , ("spi", spi)
-      ]
-
-mkC :: [String] -> [FilePath]
-mkC = map (<.> ".c")
-
-mkIdl :: [String] -> [FilePath]
-mkIdl = map (<.> ".idl4")
-
-mkHdr :: [String] -> [FilePath]
-mkHdr = map (<.> ".h")
-
-mkCamkes :: String -> FilePath
-mkCamkes nm = nm <.> "camkes"
-
-putComponents :: String
-              -> ([FilePath],[FilePath])
-              -> [R.Artifact]
-putComponents nm (srcs, hdrs) =
-    a compDir (mkCamkes nm)
-  : map (a (compDir </> "src")) (mkC srcs)
- ++ map (a (compDir </> "include")) (mkHdr hdrs)
-  where
-  compDir = "components" </> nm
-
-dataDir :: FilePath
-dataDir = "data/can"
-
-a :: FilePath -> FilePath -> Artifact
-a d f = R.artifactPath d
-      $ R.artifactCabalFile P.getDataDir (dataDir </> d </> f)
-
-interfaces :: [String]
-interfaces = ["can_tx", "can_rx", "gpio", "clk", "spi"]
-
-include :: [String]
-include =
-  [ "can_inf"
-  , "common"
-  , "spi_inf"
-  , "utils"
-  ]
-
-can, can_node, clk, gpio, spi :: ([String], [String])
-can = (,)
-  [ "controller"
-  , "dev"
-  , "irq"
-  , "prio"
-  , "queue"
-  , "spi_cmd"
-  ]
-  [ "mcp2515"
-  , "queue"
-  , "can_inf"
-  ]
-
-can_node = (,)
-  [ "can_node"
-  ]
-  [ "can_inf"
-  ]
-
-clk = ([ "clk" ], [])
-
-gpio = ([ "gpio" ], [])
-
-spi = ([ "spi" ], [])
-

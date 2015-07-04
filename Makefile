@@ -2,23 +2,30 @@ IVORY_REPO ?= ../ivory
 TOWER_REPO ?= ../tower
 include Makefile.sandbox
 
+CAN_DATA       := data/can
+CAMERA_VM_DATA := data/camera_vm
+
 .PHONY: test
-test: serial-test
-test: can-test
-test: camera_vm-test
+test: serial_test_out
+test: can_test_out
+test: camera_vm_test_out
 
-.PHONY: serial-test
-serial-test:
-	cabal run serial-test -- --src-dir=serial_test_out --lib-dir=ivory_serial
+.PHONY: serial_test_out
+serial_test_out:
+	cabal run serial-test -- --src-dir=$@ --lib-dir=ivory_serial
 
-.PHONY: can-test
-can-test:
-	rm -rf can_test_out
-	cp -r test/can_test/can_test_artifacts ./can_test_out
-	cabal run can-test -- --src-dir=can_test_out --lib-dir=ivory_can
+.PHONY: can_test_out
+can_test_out:
+	rm -rf $@
+	mkdir $@
+	cp -r $(CAN_DATA)/* ./$@/
+	cp -r test/can_test/can_test_artifacts/* ./$</
+	cabal run can-test -- --src-dir=$@ --lib-dir=ivory_can
 
-.PHONY: camera_vm-test
-camera_vm-test:
-	rm -rf camera_vm_test_out
-	cp -r test/camera_vm/camera_vm_artifacts ./camera_vm_test_out
-	cabal run camera_vm-test -- --src-dir=camera_vm_test_out --lib-dir=camera_vm_tower
+.PHONY: camera_vm_test_out
+camera_vm_test_out:
+	rm -rf $@
+	mkdir $@
+	cp -r $(CAMERA_VM_DATA)/* ./$@/
+	cp -r test/camera_vm/camera_vm_test_artifacts/* ./$@
+	cabal run camera_vm-test -- --src-dir=$@ --lib-dir=camera_vm_tower
