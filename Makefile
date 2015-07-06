@@ -2,6 +2,7 @@ IVORY_REPO ?= ../ivory
 TOWER_REPO ?= ../tower
 include Makefile.sandbox
 
+UART_DATA      := data/uart
 CAN_DATA       := data/can
 CAMERA_VM_DATA := data/camera_vm
 
@@ -12,6 +13,9 @@ test: camera_vm_test_out
 
 .PHONY: serial_test_out
 serial_test_out:
+	rm -rf $@
+	mkdir $@
+	cp -r $(UART_DATA)/* ./$@/
 	cabal run serial-test -- --src-dir=$@ --lib-dir=ivory_serial
 
 .PHONY: can_test_out

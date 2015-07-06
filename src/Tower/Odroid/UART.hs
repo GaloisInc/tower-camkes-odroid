@@ -33,9 +33,6 @@ import qualified Ivory.Tower.HAL.Bus.Interface as I
 
 import           Tower.AADL.Config
 
-import           System.FilePath
-import qualified Paths_tower_camkes_odroid as P
-
 --------------------------------------------------------------------------------
 
 uart :: String
@@ -52,7 +49,6 @@ uartTower
   = do
   towerModule  uartModule
   towerDepends uartModule
-  mapM_ towerArtifact uartArtifacts
 
   -- From sender to translator
   req_chan  <- channel
@@ -120,18 +116,6 @@ wrapperMonitor req_chanRx resp_chanTx rx_chanTx = do
 uartModule :: Module
 uartModule = package "towerUartDeps" $
   defStruct (Proxy :: Proxy "ivory_string_UartPacket")
-
-uartArtifacts :: [R.Located R.Artifact]
-uartArtifacts = map R.Root
-  [ a compDir (uart <.> "camkes")
-  , a srcDir  "driver.c"
-  ]
-  where
-  a d f   = R.artifactPath d
-          $ R.artifactCabalFile P.getDataDir (uartDir </> d </> f)
-  uartDir = "data/uart"
-  compDir = "components" </> uart
-  srcDir  = compDir </> "src"
 
 uartConfig :: AADLConfig
 uartConfig = defaultAADLConfig { configSystemHW = ODROID }
