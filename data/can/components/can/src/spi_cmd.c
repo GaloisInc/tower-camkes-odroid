@@ -276,7 +276,7 @@ void mcp2515_read_rxb(uint8_t *buf, uint8_t len, uint8_t idx, uint8_t flag)
 	 * The high bit refer to RXB0 and RXB1.
 	 * If the low bit is set, address points to RX buffer's data register.
 	 */
-	uint8_t mask = (idx * 2) | flag;
+	uint8_t mask = (idx << 2) | (flag << 1);
 
 	spi_lock_lock();
 
