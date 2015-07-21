@@ -25,6 +25,10 @@
 
 #include <autoconf.h>
 
+#include <camkes.h>
+
+extern int start_extra_frame_caps; 
+
 #define LINUX_RAM_BASE    0x40000000
 #define LINUX_RAM_SIZE    0x40000000
 #define ATAGS_ADDR        (LINUX_RAM_BASE + 0x100)
@@ -34,11 +38,11 @@
 #define MACH_TYPE_SPECIAL    ~0
 #define MACH_TYPE            MACH_TYPE_SPECIAL
 
-#ifdef CONFIG_CAMERA_VM_EMMC2_NODMA
+#ifdef CONFIG_VM_EMMC2_NODMA
 #define FEATURE_MMC_NODMA
 #endif
 
-#ifdef CONFIG_CAMERA_VM_VUSB
+#ifdef CONFIG_VM_VUSB
 #define FEATURE_VUSB
 #endif
 
@@ -255,12 +259,11 @@ vusb_notify(void)
 
 #endif /* FEATURE_VUSB */
 
+
 /* VCHAN */
-// #if 1
 
 static int
 vchan_device_fault_handler(struct device* d UNUSED, vm_t* vm, fault_t* fault){
-
     uint32_t data = fault_get_data(fault);
     vchan_entry_point(vm, data);
     // fflush(stdout);
@@ -270,17 +273,12 @@ vchan_device_fault_handler(struct device* d UNUSED, vm_t* vm, fault_t* fault){
 
 struct device vchan_dev = {
         .devid = DEV_CUSTOM,
-        .name = "Vchan driver",
+        .name = "vchan-driver",
         .pstart = 0x2040000,
         .size = 0x1000,
         .handle_page_fault = &vchan_device_fault_handler,
         .priv = NULL,
     };
-
-
-// #endif
-
-
 
 void
 configure_clocks(vm_t *vm)
@@ -333,6 +331,15 @@ install_linux_devices(vm_t* vm)
     /* Install pass through devices */
     for (i = 0; i < sizeof(linux_pt_devices) / sizeof(*linux_pt_devices); i++) {
         err = vm_install_passthrough_device(vm, linux_pt_devices[i]);
+    }
+
+    /* hack to give access to other components */
+    #define FRAME_SIZE 4096
+    int offset = 0;
+    for (i = 0; i < num_extra_frame_caps; i++) {
+	err = vm_map_frame(vm, start_extra_frame_caps + i, extra_frame_map_address + offset, 12, 1, seL4_AllRights);
+        assert(!err);
+	offset += FRAME_SIZE;
     }
 
     return 0;
