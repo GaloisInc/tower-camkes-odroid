@@ -105,5 +105,7 @@ assembly {
 
         vm._control_priority = 101;
         vm.sem_value = 0;
+        vm.num_extra_frame_caps = 0;
+        vm.extra_frame_map_address = 0;
     }
 }

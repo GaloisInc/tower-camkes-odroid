@@ -51,60 +51,28 @@ static camkes_vchan_con_t con = {
 #endif
 
 
-static int verify_packet(vchan_packet_t *pak) {
-    for(int i = 0; i < 4; i++) {
-        if(pak->datah[i] != i + pak->pnum) {
-            /* Malformed data */
-            return 0;
-        }
-    }
-    return 1;
-}
-
 static void rec_packet(libvchan_t * con) {
     size_t sz;
     char done = 1;
     int x, pnum;
-    char comp[6];
-    vchan_packet_t pak;
+    int dataSize;
+    float angles[2];
 
-    libvchan_wait(con);
-    sz = libvchan_read(con, &pnum, sizeof(int));
-    assert(sz == sizeof(int));
-
-    DHELL("camera_vm: number of packets to recieve = %d\n", pnum);
-
-    for(x = 0; x < pnum; x++) {
 	bbox bbox;
 
         libvchan_wait(con);
-        /* Buffer sanity checking */
-        assert(libvchan_data_ready(con) != 0);
-        //assert(libvchan_buffer_space(con) == FILE_DATAPORT_MAX_SIZE);
-        /* Perform read operation */
-        sz = libvchan_read(con, &pak, sizeof(pak));
-        /* See if the given packet is correct */
-        assert(sz == sizeof(pak));
-        assert(pak.guard == TEST_VCHAN_PAK_GUARD);
-        //DHELL("camera_vm.packet %d|%d\n", x, sizeof(pak));
+        int readSize = libvchan_read(con, angles, 2*sizeof(float));
+        assert(readSize == 2*sizeof(float));
+        DHELL("received an angle packet");
 
-	bbox.left = pak.datah[0];
-	bbox.right = pak.datah[1];
-	bbox.top = pak.datah[2];
-	bbox.bottom = pak.datah[3];
-
-	// TODO: Fill in bbox
 	if (camera_vm_Output_from_vm_0_write_bbox(&bbox)) {
 	    printf("Wrote bbox\n");
 	} else {
 	    printf("Failed to write bbox\n");
 	}
-    }
 
     DHELL("camera_vm: sending ack\n");
-
-    sz = libvchan_write(con, &done, sizeof(char));
-    assert(sz == sizeof(char));
+    libvchan_send(con, &done, sizeof(char));
 }
 
 
