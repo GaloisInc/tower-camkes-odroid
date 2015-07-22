@@ -45,33 +45,29 @@ static camkes_vchan_con_t con = {
 #define DEBUG_CAMERA_VM
 
 #ifdef DEBUG_CAMERA_VM
-#define DHELL(...) do{ printf("CAMERA VM DEBUG: "); printf(__VA_ARGS__); }while(0)
+#define DVM(...) do{ printf("CAMERA VM DEBUG: "); printf(__VA_ARGS__); }while(0)
 #else
-#define DHELL(...) do{}while(0)
+#define DVM(...) do{}while(0)
 #endif
 
 
 static void rec_packet(libvchan_t * con) {
-    size_t sz;
     char done = 1;
-    int x, pnum;
-    int dataSize;
     float angles[2];
+    bbox bbox;
 
-	bbox bbox;
-
-        libvchan_wait(con);
-        int readSize = libvchan_read(con, angles, 2*sizeof(float));
-        assert(readSize == 2*sizeof(float));
-        DHELL("received an angle packet");
-
-	if (camera_vm_Output_from_vm_0_write_bbox(&bbox)) {
-	    printf("Wrote bbox\n");
-	} else {
-	    printf("Failed to write bbox\n");
-	}
-
-    DHELL("camera_vm: sending ack\n");
+    libvchan_wait(con);
+    int readSize = libvchan_read(con, angles, 2*sizeof(float));
+    assert(readSize == 2*sizeof(float));
+    DVM("received an angle packet\n");
+    
+    if (camera_vm_Output_from_vm_0_write_bbox(&bbox)) {
+	DVM("wrote bbox\n");
+    } else {
+	DVM("failed to write bbox\n");
+    }
+    
+    DVM("camera_vm: sending ack\n");
     libvchan_send(con, &done, sizeof(char));
 }
 
@@ -79,7 +75,7 @@ static void rec_packet(libvchan_t * con) {
 int run(void) {
     libvchan_t *connection;
 
-    printf("vm_camera wrapper init\n");
+    DVM("vm_camera wrapper init\n");
 
     con.data_buf = (void *)share_mem;
     connection = libvchan_server_init(0, 25, 0, 0);
@@ -87,10 +83,10 @@ int run(void) {
         connection = link_vchan_comp(connection, &con);
     assert(connection != NULL);
 
-    printf("vm_camera connection active\n");
+    DVM("vm_camera connection active\n");
 
     while(1) {
-        printf("camera_vm.packet\n");
+        DVM("camera_vm.packet\n");
         rec_packet(connection);
     }
 }
