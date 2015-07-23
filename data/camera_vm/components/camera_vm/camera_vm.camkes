@@ -105,6 +105,7 @@ assembly {
 
         vm.priority = 101;
         vchan_0.priority = 102;
+	camera_vm_inst.priority = 103;
 
         vm.sem_value = 0;
         vm.num_extra_frame_caps = 0;
