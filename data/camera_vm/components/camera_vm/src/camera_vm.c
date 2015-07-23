@@ -56,7 +56,7 @@ static void rec_packet(libvchan_t * con) {
     bbox bbox;
 
     libvchan_wait(con);
-    int readSize = libvchan_read(con, angles, 2*sizeof(float));
+    int readSize = libvchan_recv(con, angles, 2*sizeof(float));
     assert(readSize == 2*sizeof(float));
     DVM("received an angle packet\n");
     
