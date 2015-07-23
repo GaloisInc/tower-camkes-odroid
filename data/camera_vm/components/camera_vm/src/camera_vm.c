@@ -24,7 +24,6 @@
 #include <camera_vm.h>
 
 #include <camkes/dataport.h>
-#define NUM_PACKETS 80
 
 #include "smaccm_camera_vm.h"
 
@@ -42,7 +41,7 @@ static camkes_vchan_con_t con = {
     .source_dom_number = 50,
 };
 
-#define DEBUG_CAMERA_VM
+// #define DEBUG_CAMERA_VM
 
 #ifdef DEBUG_CAMERA_VM
 #define DVM(...) do{ printf("CAMERA VM DEBUG: "); printf(__VA_ARGS__); }while(0)
