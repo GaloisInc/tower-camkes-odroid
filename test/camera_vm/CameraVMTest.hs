@@ -36,10 +36,8 @@ testCameraVM = do
   monitor "receiverMonitor" $
     handler rx "receiver" $
      callback $ \msg -> do
-       call_ printf32 "left   %u\n" =<< deref (msg ~> left)
-       call_ printf32 "right  %u\n" =<< deref (msg ~> right)
-       call_ printf32 "top    %u\n" =<< deref (msg ~> top)
-       call_ printf32 "bottom %u\n" =<< deref (msg ~> bottom)
+       call_ printfFloat "left   %u\n" =<< deref (msg ~> angle_x)
+       call_ printfFloat "right  %u\n" =<< deref (msg ~> angle_y)
 
 --------------------------------------------------------------------------------
 -- Compiler
@@ -53,9 +51,9 @@ main = compileTowerAADL id p testCameraVM
 -- Helpers
 
 [ivory|
-import (stdio.h, printf) void printf32(string x, uint32_t y)
+import (stdio.h, printf) void printfFloat(string x, float y)
 |]
 
 towerDepModule :: Module
 towerDepModule = package "towerDeps" $ do
-  incl printf32
+  incl printfFloat

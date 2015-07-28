@@ -42,7 +42,7 @@
 
 	// These are functions that are provided by the AADL middleware for 
 	// communication with other threads
-	bool emitter_from_vm_chan_2(const bbox * Output_from_vm_0); 
+	bool emitter_from_vm_chan_2(const camera_angles * Output_from_vm_0); 
 		//////////////////////////////////////////////////////////////////////////
 		// 
 		// Note: thread is declared EXTERNAL; user should provide run() function.
