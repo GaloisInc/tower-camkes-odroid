@@ -52,21 +52,33 @@ static camkes_vchan_con_t con = {
 
 static void rec_packet(libvchan_t * con) {
     char done = 1;
-    float angles[2];
-		struct camera_angles ca;
+    int data[4];
+	struct camera_angles ca;
 
     libvchan_wait(con);
-    int readSize = libvchan_recv(con, angles, 2*sizeof(float));
-    assert(readSize == 2*sizeof(float));
-    DVM("received an angle packet\n");
+    int readSize = libvchan_recv(con, data, 4*sizeof(int));
+    assert(readSize == 4*sizeof(int));
+    DVM("received bounding box packet\n");
 
-		ca.angle_x = angles[0];
-		ca.angle_y = angles[1];
+    //here are your corners Lee!
+    int l = data[0];
+    int r = data[1];
+    int t = data[2];
+    int b = data[3];
+
+    int xmid = ((r + l) / 2) - 160;
+    int ymid = ((b + t) / 2) - 100;
+
+    ymid = -1.0*ymid; //sign change (based on how the camera is oriented)
+
+    //here are your angles Lee!
+    ca.angle_x = ((float) xmid)*(0.00410666);
+    ca.angle_y = ((float) ymid)*(0.00410666);
 
     if (camera_vm_Output_from_vm_0_write_camera_angles(&ca)) {
-	DVM("wrote angles\n");
+	DVM("wrote bounding box\n");
     } else {
-	DVM("failed to write angles\n");
+	DVM("failed to write bouding box\n");
     }
 
     DVM("camera_vm: sending ack\n");
