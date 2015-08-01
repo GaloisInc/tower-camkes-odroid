@@ -3,14 +3,14 @@ import <Vchan/Vchan.camkes>;
 import <VchanInterface.idl4>;
 
 import "../VM/VM.camkes";
-import "../../interfaces/camera_angles_writer.idl4";
+import "../../interfaces/camera_data_writer.idl4";
 
 component camera_vm {
   control;
 
   // Interface to external aadl world
   include "smaccm_sys_impl_types.h";
-  uses camera_angles_writer camera_vm_Output_from_vm_0;
+  uses camera_data_writer camera_vm_Output_from_vm_0;
 	
   // Interface to internal vchan wrapper world
   include "sel4vchan/vchan_sharemem.h";

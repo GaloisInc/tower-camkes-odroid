@@ -15,8 +15,8 @@
 #include <utils/util.h>
 #include <uart.h>
 
-#define BAUD_RATE 115200
-//#define BAUD_RATE 57600
+//#define BAUD_RATE 115200
+#define BAUD_RATE 57600
 
 #ifdef CONFIG_PLAT_EXYNOS5410
 #define DEV_ID  PS_SERIAL1

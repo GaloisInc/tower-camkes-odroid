@@ -22,7 +22,7 @@ module Tower.Odroid.CameraVM
   ( cameraVMTower
   , cameraVMModule
   , cameraVMConfig
-  , angle_x, angle_y
+  , bbox_l, bbox_r, bbox_t, bbox_b
   )
   where
 
@@ -32,7 +32,7 @@ import           Tower.AADL.Config
 
 --------------------------------------------------------------------------------
 
-cameraVMTower :: Tower e (ChanOutput (Struct "camera_angles"))
+cameraVMTower :: Tower e (ChanOutput (Struct "camera_data"))
 cameraVMTower = do
   towerModule  cameraVMModule
   towerDepends cameraVMModule
@@ -41,22 +41,24 @@ cameraVMTower = do
   (fromMonitorTx, fromMonitorRx) <- channel
 
   externalMonitor "camera_vm" $
-    handler (fromVMRx :: ChanOutput (Struct "camera_angles")) "from_vm" $ do
+    handler (fromVMRx :: ChanOutput (Struct "camera_data")) "from_vm" $ do
       e <- emitter fromMonitorTx 1
       callback $ \msg -> emit e msg
 
   return fromMonitorRx
 
 [ivory|
-struct camera_angles {
-  float angle_x;
-  float angle_y;
+struct camera_data {
+  uint16_t bbox_l;
+  uint16_t bbox_r;
+  uint16_t bbox_t;
+  uint16_t bbox_b;
 }
 |]
 
 cameraVMModule :: Module
 cameraVMModule = package "towerCameraVMDeps" $
-  defStruct (Proxy :: Proxy "camera_angles")
+  defStruct (Proxy :: Proxy "camera_data")
 
 cameraVMConfig :: AADLConfig
 cameraVMConfig = defaultAADLConfig { configSystemHW       = ODROID

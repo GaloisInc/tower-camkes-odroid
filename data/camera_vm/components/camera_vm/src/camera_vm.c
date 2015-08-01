@@ -53,7 +53,7 @@ static camkes_vchan_con_t con = {
 static void rec_packet(libvchan_t * con) {
     char done = 1;
     int data[4];
-	struct camera_angles ca;
+		struct camera_data ca;
 
     libvchan_wait(con);
     int readSize = libvchan_recv(con, data, 4*sizeof(int));
@@ -61,21 +61,21 @@ static void rec_packet(libvchan_t * con) {
     DVM("received bounding box packet\n");
 
     //here are your corners Lee!
-    int l = data[0];
-    int r = data[1];
-    int t = data[2];
-    int b = data[3];
+    ca.bbox_l = data[0];
+    ca.bbox_r = data[1];
+    ca.bbox_t = data[2];
+    ca.bbox_b = data[3];
 
-    int xmid = ((r + l) / 2) - 160;
-    int ymid = ((b + t) / 2) - 100;
+    /* int xmid = ((r + l) / 2) - 160; */
+    /* int ymid = ((b + t) / 2) - 100; */
 
-    ymid = -1.0*ymid; //sign change (based on how the camera is oriented)
+    /* ymid = -1.0*ymid; //sign change (based on how the camera is oriented) */
 
-    //here are your angles Lee!
-    ca.angle_x = ((float) xmid)*(0.00410666);
-    ca.angle_y = ((float) ymid)*(0.00410666);
+    /* //here are your angles Lee! */
+    /* ca.angle_x = ((float) xmid)*(0.00410666); */
+    /* ca.angle_y = ((float) ymid)*(0.00410666); */
 
-    if (camera_vm_Output_from_vm_0_write_camera_angles(&ca)) {
+    if (camera_vm_Output_from_vm_0_write_camera_data(&ca)) {
 	DVM("wrote bounding box\n");
     } else {
 	DVM("failed to write bouding box\n");
