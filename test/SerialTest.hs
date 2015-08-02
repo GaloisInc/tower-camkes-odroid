@@ -66,8 +66,11 @@ testSerial = do
   monitor "receiver" $ do
     handler o "receiverHandler" $ do
       callback $ \msg -> do -- Receive from wrapper
-        d <- deref msg
-        call_ printf1 "Received input: %c\n" d
+        len <-  msg ~>* stringLengthL
+        let d = msg ~>  stringDataL
+        arrayMap $ \ix -> do
+          when (fromIx ix <? len) $
+            call_ printf1 "Received input: %c\n" =<< deref (d!ix)
 
 --------------------------------------------------------------------------------
 -- Compiler

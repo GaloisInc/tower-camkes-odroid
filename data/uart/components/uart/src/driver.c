@@ -116,17 +116,12 @@ bool Input_send_write_ivory_string_UartPacket(const ivory_string_UartPacket *pac
 
 int run(void)
 {
-    char buf[256];
-    
-    while (1) {
-	int r = uart_read(&buf, 256);
-	for (int i = 0; i < r; i++) {
-	    bool sent = false;
-	    while (!sent) {
-		sent = uart_Output_recv_rx_0_write_uint8_t((uint8_t*) &(buf[i]));
-	    }
-	}
-    }
+	struct ivory_string_UartPacket p;
 
-    return 0;
+	while (1) {
+		int r = uart_read((char*) p.ivory_string_UartPacket_data, 255);
+		p.ivory_string_UartPacket_len = r;
+		uart_Output_recv_rx_0_write_ivory_string_UartPacket(&p);
+	}
+	return 0;
 }

@@ -1,5 +1,4 @@
 import "../../interfaces/uart_interface.idl4";
-import "../../interfaces/uint8_t_writer.idl4";
 import "../../interfaces/bool_writer.idl4";
 import "../../interfaces/void_writer.idl4";
 import "../../interfaces/ivory_string_UartPacket_writer.idl4";
@@ -8,9 +7,8 @@ component uart {
   control;
 
   include "smaccm_sys_impl_types.h";
-
   provides ivory_string_UartPacket_writer Input_send;
-  uses uint8_t_writer uart_Output_recv_rx_0;
+  uses ivory_string_UartPacket_writer uart_Output_recv_rx_0;
   uses bool_writer uart_Output_recv_resp_0;
 
   // Hardware interface

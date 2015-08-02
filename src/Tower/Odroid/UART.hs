@@ -44,7 +44,7 @@ uart = "uart"
 -- fixed.
 uartTower :: IvoryString str
           => Tower e ( I.BackpressureTransmit str (Stored IBool)
-                     , ChanOutput (Stored Uint8))
+                     , ChanOutput UartPacket)
 uartTower
   = do
   towerModule  uartModule
@@ -84,7 +84,7 @@ uartTower
 -- The wrapper just passes the channel values through to and from the driver.
 wrapperMonitor :: ChanOutput (Struct "ivory_string_UartPacket")
                -> ChanInput (Stored IBool)
-               -> ChanInput (Stored Uint8)
+               -> ChanInput UartPacket
                -> Tower e ()
 wrapperMonitor req_chanRx resp_chanTx rx_chanTx = do
 
