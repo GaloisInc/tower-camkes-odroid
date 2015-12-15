@@ -7,7 +7,7 @@ before_install:
 - export TOWER_REPO=$PWD/tower
 install:
 - cabal install cabal-install
-- cabal install alex happy
+- cabal install alex-3.1.4 happy
 script:
 - make create-sandbox
 - make
