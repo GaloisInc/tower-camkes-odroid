@@ -28,7 +28,6 @@ module Tower.Odroid.UART
 import           Ivory.Tower
 import           Ivory.Language
 import           Ivory.Stdlib
-import           Ivory.Artifact          as R
 import qualified Ivory.Tower.HAL.Bus.Interface as I
 
 import           Tower.AADL.Config
@@ -43,7 +42,7 @@ uart = "uart"
 -- | Wrapper monitor. The string names (e.g., "uart") must be unique and
 -- fixed.
 uartTower :: IvoryString str
-          => Tower e ( I.BackpressureTransmit str (Stored IBool)
+          => Tower e ( I.BackpressureTransmit str ('Stored IBool)
                      , ChanOutput UartPacket)
 uartTower
   = do
@@ -82,8 +81,8 @@ uartTower
   return (I.BackpressureTransmit (fst req_chan) (snd resp_chan), snd rx_chan)
 
 -- The wrapper just passes the channel values through to and from the driver.
-wrapperMonitor :: ChanOutput (Struct "ivory_string_UartPacket")
-               -> ChanInput (Stored IBool)
+wrapperMonitor :: ChanOutput ('Struct "ivory_string_UartPacket")
+               -> ChanInput ('Stored IBool)
                -> ChanInput UartPacket
                -> Tower e ()
 wrapperMonitor req_chanRx resp_chanTx rx_chanTx = do

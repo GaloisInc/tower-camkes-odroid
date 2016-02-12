@@ -1,6 +1,4 @@
-IVORY_REPO ?= ../ivory
-TOWER_REPO ?= ../tower
-include Makefile.sandbox
+include stack.mk
 
 UART_DATA      := data/uart
 CAN_DATA       := data/can
@@ -16,7 +14,7 @@ serial_test_out:
 	rm -rf $@
 	mkdir $@
 	cp -r $(UART_DATA)/* ./$@/
-	cabal run serial-test -- --src-dir=$@ --lib-dir=ivory_serial
+	stack build . --exec 'serial-test --src-dir=$@ --lib-dir=ivory_serial'
 
 .PHONY: can_test_out
 can_test_out:
@@ -24,7 +22,7 @@ can_test_out:
 	mkdir $@
 	cp -r $(CAN_DATA)/* ./$@/
 	cp -r test/can_test/can_test_artifacts/* ./$</
-	cabal run can-test -- --src-dir=$@ --lib-dir=ivory_can
+	stack build . --exec 'can-test --src-dir=$@ --lib-dir=ivory_can'
 
 .PHONY: camera_vm_test_out
 camera_vm_test_out:
@@ -32,4 +30,9 @@ camera_vm_test_out:
 	mkdir $@
 	cp -r $(CAMERA_VM_DATA)/* ./$@/
 	cp -r test/camera_vm/camera_vm_test_artifacts/* ./$@
-	cabal run camera_vm-test -- --src-dir=$@ --lib-dir=camera_vm_tower
+	stack build . --exec 'camera_vm-test --src-dir=$@ --lib-dir=camera_vm_tower'
+
+TRAVIS_STACK ?= stack --no-terminal --system-ghc --skip-ghc-check
+travis-test:
+	$(TRAVIS_STACK) build --test --no-run-tests --haddock --no-haddock-deps --pedantic
+	make test

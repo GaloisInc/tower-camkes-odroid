@@ -34,8 +34,8 @@ import           Tower.AADL.Config
 --------------------------------------------------------------------------------
 
 canTower ::
-  Tower e ( ChanOutput (Struct "can_message")
-          , AbortableTransmit (Struct "can_message") (Stored IBool)
+  Tower e ( ChanOutput ('Struct "can_message")
+          , AbortableTransmit ('Struct "can_message") ('Stored IBool)
           )
 canTower
   = do
@@ -65,9 +65,9 @@ canTower
   return (snd recv, as)
 
 perMailboxHandlers ::
-  ( ChanOutput (Struct "can_message")
-  , ChanOutput (Stored IBool)
-  , ChanInput  (Stored IBool)
+  ( ChanOutput ('Struct "can_message")
+  , ChanOutput ('Stored IBool)
+  , ChanInput  ('Stored IBool)
   )
   -> Tower e [Monitor e0 ()]
 perMailboxHandlers (sendRx, abortRx, statusTx) = do

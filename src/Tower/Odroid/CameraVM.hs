@@ -32,7 +32,7 @@ import           Tower.AADL.Config
 
 --------------------------------------------------------------------------------
 
-cameraVMTower :: Tower e (ChanOutput (Struct "camera_data"))
+cameraVMTower :: Tower e (ChanOutput ('Struct "camera_data"))
 cameraVMTower = do
   towerModule  cameraVMModule
   towerDepends cameraVMModule
@@ -41,7 +41,7 @@ cameraVMTower = do
   (fromMonitorTx, fromMonitorRx) <- channel
 
   externalMonitor "camera_vm" $
-    handler (fromVMRx :: ChanOutput (Struct "camera_data")) "from_vm" $ do
+    handler (fromVMRx :: ChanOutput ('Struct "camera_data")) "from_vm" $ do
       e <- emitter fromMonitorTx 1
       callback $ \msg -> emit e msg
 
