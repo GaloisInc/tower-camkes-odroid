@@ -30,6 +30,7 @@ import           Ivory.Tower.HAL.Bus.CAN
 import           Ivory.Tower.HAL.Bus.Interface
 
 import           Tower.AADL.Config
+import           Tower.AADL.Platform
 
 --------------------------------------------------------------------------------
 

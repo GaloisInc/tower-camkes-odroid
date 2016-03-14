@@ -44,10 +44,7 @@ executable serial-test
                , tower-hal
                , tower-camkes-odroid
   default-language: Haskell2010
-  if impl(ghc >= 7.8)
-    ghc-options:        -Wall -fhpc -fplugin=Ivory.Tower.SrcLoc.Plugin -fplugin-opt=Ivory.Tower.SrcLoc.Plugin:kill-foreign-stubs
-  else
-    ghc-options:        -Wall
+  ghc-options:        -Wall
 
 executable can-test
   hs-source-dirs:   test/can_test
@@ -60,10 +57,7 @@ executable can-test
                , tower-hal
                , tower-camkes-odroid
   default-language: Haskell2010
-  if impl(ghc >= 7.8)
-    ghc-options:        -Wall -fhpc -fplugin=Ivory.Tower.SrcLoc.Plugin -fplugin-opt=Ivory.Tower.SrcLoc.Plugin:kill-foreign-stubs
-  else
-    ghc-options:        -Wall
+  ghc-options:        -Wall
 
 executable camera_vm-test
   hs-source-dirs:   test/camera_vm
@@ -76,7 +70,4 @@ executable camera_vm-test
                , tower-hal
                , tower-camkes-odroid
   default-language: Haskell2010
-  if impl(ghc >= 7.8)
-    ghc-options:        -Wall -fhpc -fplugin=Ivory.Tower.SrcLoc.Plugin -fplugin-opt=Ivory.Tower.SrcLoc.Plugin:kill-foreign-stubs
-  else
-    ghc-options:        -Wall
+  ghc-options:        -Wall

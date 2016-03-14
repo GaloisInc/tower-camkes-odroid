@@ -31,6 +31,7 @@ import           Ivory.Stdlib
 import qualified Ivory.Tower.HAL.Bus.Interface as I
 
 import           Tower.AADL.Config
+import           Tower.AADL.Platform
 
 --------------------------------------------------------------------------------
 

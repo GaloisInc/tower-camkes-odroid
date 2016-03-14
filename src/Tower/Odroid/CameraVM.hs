@@ -29,6 +29,7 @@ module Tower.Odroid.CameraVM
 import           Ivory.Tower
 import           Ivory.Language
 import           Tower.AADL.Config
+import           Tower.AADL.Platform
 
 --------------------------------------------------------------------------------
 
