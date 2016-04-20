@@ -78,7 +78,7 @@ static void rec_packet(libvchan_t * con) {
     if (camera_vm_Output_from_vm_0_write_camera_data(&ca)) {
 	DVM("wrote bounding box\n");
     } else {
-	DVM("failed to write bouding box\n");
+	DVM("failed to write bounding box\n");
     }
 
     DVM("camera_vm: sending ack\n");

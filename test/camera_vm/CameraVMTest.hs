@@ -31,7 +31,8 @@ testCameraVM = do
   towerModule  towerDepModule
   towerDepends towerDepModule
 
-  rx <- cameraVMTower
+  reboot_chan <- channel
+  rx <- cameraVMTower (snd reboot_chan :: ChanOutput ('Stored IBool))
 
   monitor "receiverMonitor" $
     handler rx "receiver" $
