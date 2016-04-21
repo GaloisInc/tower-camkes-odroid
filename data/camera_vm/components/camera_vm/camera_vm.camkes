@@ -10,6 +10,7 @@ component camera_vm {
 
   // Interface to external aadl world
   include "smaccm_sys_impl_types.h";
+  provides sequence_numbered_reboot_req_writer Input_reboot_vm;
   uses camera_data_writer camera_vm_Output_from_vm_0;
 	
   // Interface to internal vchan wrapper world
