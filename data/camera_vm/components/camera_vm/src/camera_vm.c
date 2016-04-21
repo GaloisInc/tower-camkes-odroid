@@ -85,6 +85,10 @@ static void rec_packet(libvchan_t * con) {
     libvchan_send(con, &done, sizeof(char));
 }
 
+bool Input_reboot_vm_write_sequence_numbered_reboot_req(const sequence_numbered_reboot_req *req) {
+	printf("Received reboot request\n");
+	return true;
+}
 
 int run(void) {
     libvchan_t *connection;
