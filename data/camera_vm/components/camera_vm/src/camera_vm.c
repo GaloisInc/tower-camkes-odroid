@@ -87,6 +87,7 @@ static void rec_packet(libvchan_t * con) {
 
 bool Input_reboot_vm_write_sequence_numbered_reboot_req(const sequence_numbered_reboot_req *req) {
 	printf("Received reboot request\n");
+	restart_vm_emit();
 	return true;
 }
 
