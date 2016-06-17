@@ -27,7 +27,6 @@ module Tower.Odroid.UART
 
 import           Ivory.Tower
 import           Ivory.Language
-import           Ivory.Stdlib
 import qualified Ivory.Tower.HAL.Bus.Interface as I
 
 import           Tower.AADL.Config
@@ -42,42 +41,21 @@ uart = "uart"
 
 -- | Wrapper monitor. The string names (e.g., "uart") must be unique and
 -- fixed.
-uartTower :: IvoryString str
-          => Tower e ( I.BackpressureTransmit str ('Stored IBool)
+uartTower :: Tower e ( I.BackpressureTransmit UartPacket ('Stored IBool)
                      , ChanOutput UartPacket)
 uartTower
   = do
   towerModule  uartModule
   towerDepends uartModule
 
-  -- From sender to translator
+  -- From sender to transmitter
   req_chan  <- channel
-  -- From translator to wrapper
-  req_chan' <- channel
   -- Response
   resp_chan <- channel
   -- Received byte
   rx_chan   <- channel
 
-  -- XXX We make a new monitor since if we just make this a handler in the
-  -- external monitor, then the only channel with the type of an
-  -- "ivory_string_UartPacket" is the outbound channel to the driver. But in
-  -- Tower, channels going nowhere are dropped, so we can't collect its type.
-  monitor "send_transdata" $ do
-    -- Now just pass through values from driver.
-    handler (snd req_chan) "send_translate" $ do
-      e <- emitter (fst req_chan') 1
-      callback $ \msg -> do
-        msg' <- local (izero :: Init UartPacket)
-        let srccap = arrayLen (msg ~> stringDataL)
-        srclen <- msg ~>* stringLengthL
-        assert $ srclen >=? 0 .&& srclen <=? srccap
-        assert $ srccap <=? arrayLen (msg' ~> stringDataL)
-        arrayCopy (msg' ~> stringDataL) (msg ~> stringDataL) 0 srclen
-        store (msg' ~> stringLengthL) srclen
-        emit e $ constRef msg'
-
-  wrapperMonitor (snd req_chan') (fst resp_chan) (fst rx_chan)
+  wrapperMonitor (snd req_chan) (fst resp_chan) (fst rx_chan)
 
   return (I.BackpressureTransmit (fst req_chan) (snd resp_chan), snd rx_chan)
 
