@@ -33,18 +33,27 @@ import           Tower.AADL.Platform
 
 --------------------------------------------------------------------------------
 
-cameraVMTower :: Tower e (ChanOutput ('Struct "camera_data"))
-cameraVMTower = do
+cameraVMTower :: (IvoryArea a, IvoryZero a)
+              => ChanOutput a
+              -> Tower e (ChanOutput ('Struct "camera_data"))
+cameraVMTower reboot_req = do
   towerModule  cameraVMModule
   towerDepends cameraVMModule
 
-  (_            , fromVMRx)      <- channel
+  (_            , fromVMRx     ) <- channel
+  (toMonitorTx  , _            ) <- channel
   (fromMonitorTx, fromMonitorRx) <- channel
 
-  externalMonitor "camera_vm" $
+  externalMonitor "camera_vm" $ do
+    -- camera data passthrough
     handler (fromVMRx :: ChanOutput ('Struct "camera_data")) "from_vm" $ do
       e <- emitter fromMonitorTx 1
       callback $ \msg -> emit e msg
+
+    -- reboot request passthrough
+    handler reboot_req "reboot_vm" $ do
+      e <- emitter toMonitorTx 1
+      callback $ \_ -> emitV e true
 
   return fromMonitorRx
 

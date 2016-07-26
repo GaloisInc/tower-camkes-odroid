@@ -10,6 +10,7 @@ component camera_vm {
 
   // Interface to external aadl world
   include "smaccm_sys_impl_types.h";
+  provides sequence_numbered_reboot_req_writer Input_reboot_vm;
   uses camera_data_writer camera_vm_Output_from_vm_0;
 	
   // Interface to internal vchan wrapper world
@@ -17,6 +18,8 @@ component camera_vm {
   dataport vchan_headers_t share_mem;
   uses VchanInterface vchan_con;
   consumes VchanEvent vevent;
+
+  emits restart restart_vm;
 }
 
 assembly {
@@ -34,6 +37,7 @@ assembly {
         connection seL4Asynch vchan_event(from vchan_0.vevent_sv, to camera_vm_inst.vevent);
         connection seL4SharedData hvchan_sharemem_0(from camera_vm_inst.share_mem, to vchan_0.share_mem);
         connection seL4RPCCall hvchan(from camera_vm_inst.vchan_con, to vchan_0.vchan_com);
+        connection seL4Asynch restart_conn(from camera_vm_inst.restart_vm, to vm.restart_event);
     }
 
     configuration {

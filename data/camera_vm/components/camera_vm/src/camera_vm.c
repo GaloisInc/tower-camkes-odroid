@@ -78,13 +78,18 @@ static void rec_packet(libvchan_t * con) {
     if (camera_vm_Output_from_vm_0_write_camera_data(&ca)) {
 	DVM("wrote bounding box\n");
     } else {
-	DVM("failed to write bouding box\n");
+	DVM("failed to write bounding box\n");
     }
 
     DVM("camera_vm: sending ack\n");
     libvchan_send(con, &done, sizeof(char));
 }
 
+bool Input_reboot_vm_write_sequence_numbered_reboot_req(const sequence_numbered_reboot_req *req) {
+	printf("Received reboot request\n");
+	restart_vm_emit();
+	return true;
+}
 
 int run(void) {
     libvchan_t *connection;
